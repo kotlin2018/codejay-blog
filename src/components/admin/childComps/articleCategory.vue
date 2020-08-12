@@ -1,0 +1,215 @@
+<template>
+  <div class="article_category">
+    <h1>文章分类</h1>
+    <h3>分类表</h3>
+    <el-table :data="tableData" v-loading="loading" style="width: 80%; ">
+      <!-- <el-table-column type="selection" width="55"></el-table-column> -->
+      <el-table-column label="分类名" width="180">
+        <template slot-scope="scope">
+          <span style="margin-left: 10px">{{ scope.row.category }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="相关标签" >
+        <template slot-scope="scope">
+          <el-tag size="medium" ref="cate" style="margin-right: 10px" v-for="(item,index) in scope.row.label" :key="index">{{ item }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="相关文章数" width="180">
+        <template slot-scope="scope">
+          <span style="margin-left: 10px">{{ scope.row.article.length }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作"width="230">
+        <template slot-scope="scope">
+          <el-button size="mini" type="text" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <h3>添加分类</h3>
+    <el-input
+      class="add_category_box"
+      placeholder="请输入分类名"
+      v-model="categoryName"
+      clearable>
+    </el-input>
+    <el-button type="primary" :plain="true" @click="addCategory">确认添加</el-button>
+  </div>
+</template>
+
+<script>
+import { addCategory, updateCategory, deleteCategory, getArticle } from '../../../network/adminOperation';
+import { getCategory, getLabel } from '../../../network/getContent'
+export default {
+  name: "articleCategory",
+  data() {
+    return {
+      tableData: [],
+      categoryName: '',
+      obj: {},
+      updateCategoryName:{
+        oldCategoryName:'',
+        newCategoryName:''
+      },
+      articleArr:[],
+      loading: true
+    };
+  },
+  methods: {
+    addCategory() {
+      console.log(this.$refs.cate)
+      if(this.categoryName != ''){
+        addCategory(this.categoryName).then(res => {
+          console.log(res)
+          if(res.data.err == 0){
+            this.categoryName = ''
+            this.$message({
+              showClose: true,
+              message: res.data.msg,
+              type: 'success'
+            });
+          }else {
+            this.$message.warning(res.data.msg);
+          }
+        })
+      }else{
+        this.$message.warning('内容不能为空哦！');
+      }
+    },
+    handleEdit(index, row) {
+      this.$prompt('请输入新的分类名', `当前分类名：${row.category}`, {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(({ value }) => {
+          this.updateCategoryName.oldCategoryName = row.category;
+          this.updateCategoryName.newCategoryName = value;
+          return updateCategory(this.updateCategoryName)
+        }).then(res => {
+          if(res.data.err == 0){
+            this.$message({
+              type: 'success',
+              message: '修改成功'
+            });
+          }else {
+            this.$message({
+            type: 'error',
+            message: res.data.msg
+            })
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消输入'
+          });       
+        });
+    },
+    handleDelete(index, row) {
+      if(row.label.length > 0){
+        // alert('有相关标签或文章，不可删除')
+        this.$message({
+          type: 'error',
+          message: '该分类与其他元素有关联，不可删除'
+        })
+      }else{
+        deleteCategory(row.category).then(res => {
+          if(res.data.err == 0){
+            this.$message({
+              type: 'success',
+              message: res.data.msg
+            });
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.data.msg
+            })
+          }
+        })
+      }
+      console.log(index, row);
+    },
+    getData() {
+      getCategory().then(res => {
+        if (res.data.err == 0) {
+          let data = res.data.data;
+          data.forEach((item,index) => {
+            let newobj = {category:'',categoryid:'',label:[],article:[]}; // 定义子对象，存储分类名和标签名
+            newobj.category = item.article_category_name;
+            newobj.categoryid = item.article_category_id;
+            this.tableData.push(newobj)
+            // this.$set(this.tableData,index,newobj)
+          })
+          // promise 返回获取标签函数
+          return getLabel();
+        }else {
+          this.$message({
+            type: 'error',
+            message: '网络异常，请稍后重试！'
+          })
+        }
+      }).then(res => {
+        // 获取标签
+        if (res.data.err == 0) {
+          // 将获取的数据分类处理 之后暂存到obj对象中
+          res.data.data.forEach((item,index) => {
+            let categoryName = item.article_category_name;
+            if(!this.obj.hasOwnProperty(categoryName)){ // obj中不包括该属性名
+              this.obj[categoryName] = []; // 将该字段作为obj的属性名
+              this.obj[categoryName].push(item);
+            }else {
+              this.obj[categoryName].push(item);
+            }
+          });
+          // 遍历对象 获取对象中每个数组的值(对象)this.obj[key]
+          Object.keys(this.obj).forEach((key,index) => {
+            Object.keys(this.obj[key]).forEach((item,index2) => {
+              if(this.tableData[index].category == this.obj[key][index2].article_category_name){
+                this.tableData[index].label.push(this.obj[key][index2].article_label_name);
+              }
+            })
+          });
+          // 返回获取文章函数
+          return getArticle()
+        }else {
+          this.$message({
+            type: 'error',
+            message: '网络异常，请稍后重试！'
+          })
+        }
+      }).then(res => {
+        // 获取文章
+        let data = res.data.data;
+        data.forEach((item,index) => {
+          this.tableData.forEach((item2,index2) => {
+            if(item.article_category_id == item2.categoryid){
+              this.tableData[index2].article.push(item)
+              this.loading = false;
+            }
+          })
+        })
+      })
+    }
+  },
+
+  // 钩子 组件加载后运行
+  created() {
+    this.getData();
+  },
+}
+</script>
+
+<style>
+.article_category {
+  padding: 1rem 1.5rem 1.5rem 1rem;
+}
+.article_category h3 {
+  margin: 1.5rem 0 0.5rem 0;
+}
+.el-table {
+  border-radius: 10px;
+}
+.add_category_box{
+  width: 35%;
+  display: block;
+  margin-bottom: 1rem;
+}
+</style>
