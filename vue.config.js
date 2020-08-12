@@ -17,7 +17,7 @@ module.exports = {
       disableHostCheck: true,
       proxy: {
         '/api': {
-          target: 'http://192.168.1.106:3000', //设置你调用的接口域名和端口号 别忘了加http
+          target: 'http://XXX.XXX.X.XXX:XXX', //设置你调用的接口域名和端口号 别忘了加http
           // changeOrigin: true, //这里设置是否跨域
           changeOrigin:isDev==='development'?true:false,
           pathRewrite: {
