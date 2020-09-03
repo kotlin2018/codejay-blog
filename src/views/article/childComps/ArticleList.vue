@@ -39,9 +39,9 @@
 <script>
 import Page from "./Page";
 import { Message } from 'element-ui';
-import { articleLike } from '../../../network/userOperation';
-import uploadImage from "../../../network/uploadImage";
-import { getArticlePage, getLabelPage, getCategoryPage, getKeyWordPage } from '../../../network/getContent';
+import { articleLike } from 'network/userOperation';
+import uploadImage from "network/uploadImage";
+import { getArticlePage, getLabelPage, getCategoryPage, getKeyWordPage } from 'network/getContent';
 
 export default {
   name: "ArticleList",
@@ -55,7 +55,7 @@ export default {
       page: {
         pageNo:1,
         pageSize:5,
-      },
+      }
     };
   },
   computed:{
@@ -100,9 +100,7 @@ export default {
       this.$router.push("/detail/" + path);
     },
     pageChange() {
-      // console.log(this.page)
       getArticlePage(this.page).then(res => {
-        // console.log(res)
         if(res.data.err == 0) {
           let data = res.data.data;
           data.forEach(item => {
@@ -132,7 +130,6 @@ export default {
                 offset:'80'
               });
               localStorage.setItem(`like${articleId}`,articleId);
-              // location.reload();
               this.articleLists.forEach(item => {
                 if(item.article_id == articleId){
                   item.num_likes += 1;
@@ -145,12 +142,10 @@ export default {
                 type: 'error',
                 offset:'80'
               });
-              // alert(res.data.msg)
             }
           })
         }
         } else {
-          //  this.$Message.error("请先去登陆再来点赞噢小主！(ノへ￣、)")
            Message({
                 showClose: true,
                 message: "请先去登陆再来点赞噢小主！(ノへ￣、)",
@@ -221,7 +216,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .article_list {
     max-width: 900px;
     padding-left: 0;

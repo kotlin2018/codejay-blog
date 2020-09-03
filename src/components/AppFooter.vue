@@ -3,7 +3,7 @@
   <div class="footer">
     <section>
       {{friendShipLinks}}<br/><br/>
-      &copy;{{record}}
+      &copy; Codejay Blog All Rights Reserved 2020-2021 豫ICP备<a href="http://beian.miit.gov.cn/">2020025683</a>号
     </section>
   </div>
 </template>
@@ -13,8 +13,8 @@ export default {
   name: 'AppFooter',
   data() {
     return {
-      friendShipLinks:'友情链接: 轩陌博客  吴佳博客',
-      record:'Coderjay Blog All Rights Reserved 2020-2022 豫ICP 备1117070138号'
+      friendShipLinks:'友情链接: ',
+      // record:'Codejay Blog All Rights Reserved 2020-2021 豫ICP 备2020025683号'
     }
   }
 }

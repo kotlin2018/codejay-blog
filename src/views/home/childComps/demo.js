@@ -8,7 +8,7 @@ function blogName() {
 
   startAnimation(loading);
 
-  loading.on('animationend webkitAnimationEnd oAnimationEnd', 'span:last-child', e => {
+  loading.on('animationend webkitAnimationEnd oAnimationEnd', 'span:last-child', function(e) {
     startAnimation(loading);
   });
 
@@ -38,12 +38,8 @@ function blogName() {
   function startAnimation(elem) {
     elem.removeClass('start');
     setCSSVars(elem, min, max, minMove, maxMove);
-    // void elem[0].offsetWidth;
     elem.addClass('start');
   }
-
-
-
 }
 
 export {

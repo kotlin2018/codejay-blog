@@ -10,7 +10,7 @@
         :value="item.article_id">
       </el-option>
     </el-select>
-    <el-button type="primary"  @click="getMessage(articleId)">确认查询</el-button>
+    <el-button class="select_btn" type="primary"  @click="getMessage(articleId)">确认查询</el-button>
     <h3>评论表</h3>
     <el-table :data="message"  style="width: 80%; ">
       <el-table-column label="评论者" width="200">
@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import { getMessageAndReply, hasMessage } from '../../../network/getContent';
-import { getArticle, deleteMessage } from '../../../network/adminOperation';
+import { getMessageAndReply, hasMessage } from 'network/getContent';
+import { getArticle, deleteMessage } from 'network/adminOperation';
 export default {
   name: "articleMessage",
   data() {
@@ -57,12 +57,10 @@ export default {
   methods:{
     getMessage(articleId) {
       this.message = [];
-      console.log(articleId)
       this.dialogTableVisible = !this.dialogTableVisible;
       hasMessage(articleId).then(res => {
         if(res.data.err == 0) {
           if(res.data.data > 0){
-            console.log('data',res.data.data)
             this.getMessageAndReply(articleId);
           }
         }
@@ -95,22 +93,29 @@ export default {
     },
     // 删除评论
     handleDelete(index, row) {
-      console.log(row,this.articleId)
-      deleteMessage(row.message_id,this.articleId).then(res => {
-        if(res.data.err == 0){
-          this.$message({
-            type: 'success',
-            message: res.data.msg
-          });
-          location.reload();
-        }else {
-          this.$message({
-            type: 'error',
-            message: res.data.msg
-          })
-        }
-      })
-    }
+      this.$confirm('注意：此操作会删除该留言与其相关评论, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteMessage(row.message_id,this.articleId).then(res => {
+          if(res.data.err == 0){
+            this.$message({
+              type: 'success',
+              message: res.data.msg,
+              offset:'80'
+            });
+            location.reload();
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.data.msg,
+              offset:'80'
+            })
+          }
+        }).catch(err => {})
+      });
+    } 
   },
   created() {
     getArticle().then(res => {
@@ -125,7 +130,7 @@ export default {
           message: res.data.msg
         })
       }
-    })
+    }).catch(err => {})
   }
 }
 </script>
@@ -140,6 +145,10 @@ export default {
   border-radius: 10px;
 }
 .el-select{
-  width: 80%;
+  width: calc(80% - 8rem);;
+  margin-right: 1rem;
+}
+.select_btn {
+  width: 7rem;
 }
 </style>

@@ -20,12 +20,11 @@ export default {
   data() {
     return {
       menu: [
-        // {name:'首页',iconUrl:'&#xe652;',path:'/'},
         { name: "文章列表", iconUrl: "&#xe60e;", path: "/article" },
         { name: "实战案例", iconUrl: "&#xe658;", path: "/demo" },
         { name: "关于博主", iconUrl: "&#xe638;", path: "/about" },
-        { name: "软件&工具", iconUrl: "&#xe767;", path: "/tool" },
-        { name: "生活随笔", iconUrl: "&#xe698;", path: "/essay" },
+        { name: "素材&工具", iconUrl: "&#xe767;", path: "/tool" },
+        { name: "GitHub", iconUrl: "&#xe628;", path: "" },
         { name: "登录/注册", iconUrl: "&#xe611;", path: "/login" }
       ],
       link: {
@@ -37,7 +36,11 @@ export default {
   },
   methods: {
     itemClick(path) {
-      this.$router.replace(path);
+      if(path){
+        this.$router.replace(path);
+      }else {
+        location.href="https://github.com/Jay-wj";
+      }
     }
   },
   mounted() {
@@ -54,7 +57,6 @@ export default {
 .home {
   width: 100%;
   height: 100vh;
-  /* padding: 30px 0 !important; */
   font-family: "Exo", sans-serif;
   color: #fff;
   background: linear-gradient(

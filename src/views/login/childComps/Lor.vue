@@ -1,103 +1,128 @@
 <template>
 <div class="lor">
-  <!-- 登录 -->
-  <div class="login-box" v-show="!show">
-    <h2>欢迎登录</h2>
-    <form>
-      <div class="user-box">
-        <input type="text"  v-model="formLogin.user" placeholder="用户名" name="" required="">
+  <div class="login_box">
+    <!-- 模块菜单 -->
+    <ul class="menu-tab">
+      <li v-for="item in menuTab" :key="item.id" :class="{'current':item.current}" @click="toggleMenu(item)">{{item.text}}</li>
+    </ul>
+    <!-- 表单 -->
+    <el-form :model="formLogin" status-icon :rules="rules" ref="formLogin" class="demo-ruleForm" size="medium">
+      <el-form-item prop="username">
         <label>用户名</label>
-      </div>
-      <div class="user-box">
-        <input type="password" v-model="formLogin.password" placeholder="密码" name="" required="">
+        <el-input type="text" v-model="formLogin.username" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item prop="password">
         <label>密码</label>
-      </div>
-      <div class="btn-box">
-        <a @click="userLogin">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          登 录
-        </a>
-        <a @click="switchClick">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          去 注 册
-        </a>
-      </div>
-    </form>
-  </div>
-  <!-- 注册 -->
-  <div class="login-box register-box" v-show="show" >
-    <h2>欢迎注册</h2>
-    <form>
-      <div class="user-box">
-        <input type="text" v-model="formRegister.username" placeholder="用户名" name="" required="">
-        <label>用户名</label>
-      </div>
-      <div class="user-box">
-        <input type="password" v-model="formRegister.password" placeholder="密码" name="" required="">
-        <label>密码</label>
-      </div>
-      <div class="user-box">
-        <input type="email" v-model="formRegister.email" placeholder="邮箱" name="" required="">
+        <el-input type="password" v-model="formLogin.password" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item prop="passwords" v-if="modle==='register'">
+        <label>确认密码</label>
+        <el-input type="password" v-model="formLogin.passwords" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item prop="email" v-if="modle==='register'">
         <label>邮箱</label>
-      </div>
-      <div class="send_email">
-      <a @click="sendMail">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          发 送 验 证 码
-        </a>
-      </div>
-      <div class="user-box">
-        <input type="text" v-model="formRegister.code"  placeholder="验证码" name="" required="">
+        <el-input type="text" v-model="formLogin.email" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item prop="code" v-if="modle==='register'">
         <label>验证码</label>
-      </div>
-      <div class="btn-box">
-        <a @click="register">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          注 册
-        </a>
-        <a @click="switchClick">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          去 登 录
-        </a>
-      </div>
-    </form>
+        <el-row :gutter="5">
+          <el-col :span="16"><el-input type="text" class="code-text" v-model="formLogin.code" autocomplete="off"></el-input></el-col>
+          <el-col :span="8"><el-button type="success" @click="sendMail('formLogin')" class="code-btn">获取验证码</el-button></el-col>
+        </el-row>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="danger" @click="submitClick('formLogin')" class="submit">提 交</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </div>
 </template>
 
 <script>
-import {userLogin,sendMail,registe} from '../../../network/userOperation'
+import {userLogin,sendMail,registe} from 'network/userOperation'
 export default {
   name:'Lor',
   data() {
+    /* 验证用户名 */
+    let validateUserName = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入用户名'));
+      } else {
+        callback();
+      }
+    };
+    /* 验证密码 */
+    let validatePassword = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入密码'));
+      }else {
+        callback();
+      }
+    };
+    /* 验证重复密码 */
+    var validatePasswords = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'));
+      } else if (value !== this.formLogin.password) {
+        callback(new Error('两次输入密码不一致!'));
+      } else {
+        callback();
+      }
+    };
+    /* 验证邮箱 */
+    let validateEmail = (rule, value, callback) => {
+      // 邮箱格式正则表达式
+      let reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+      if (value === '') {
+        callback(new Error('请输入邮箱'));
+      }else if(!reg.test(value)){
+        callback(new Error('邮箱格式有误'));
+      }else {
+        callback();
+      }
+    };
+    /* 验证验证码 */
+    let validateCode = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入验证码'));
+      }else {
+        callback();
+      }
+    };
     return {
       show: false,
+      // 模块菜单
+      menuTab:[
+        {text:"登录",current:true,type:'login'},
+        {text:"注册",current:false,type:'register'}
+      ],
+      // 当前模块
+      modle:'login',
       formLogin:{ 
-        user:"",
-        password:""
-
-      },
-      formRegister: {
-        username: "",
-        password: "",
+        username:"",
+        password:"",
+        passwords:"",
         email: "",
         code: ""
       },
+      // 验证规则
+      rules: {
+        username: [
+          { validator: validateUserName, trigger: 'blur' }
+        ],
+        password: [
+          { validator: validatePassword, trigger: 'blur' }
+        ],
+        passwords:[
+          { validator: validatePasswords, trigger: 'blur' }
+        ],
+        email:[
+          { validator: validateEmail, trigger: 'blur' }
+        ],
+        code:[
+          { validator: validateCode, trigger: 'blur' }
+        ]
+      }
     }
   },
   directives: {
@@ -111,305 +136,156 @@ export default {
     /**
      * 切换登录与注册
      */
-    switchClick() {
-      this.show = !this.show
+    toggleMenu(data){
+      this.menuTab.forEach((ele,index) => {
+        ele.current = false;
+        
+      });
+      // 高光
+      data.current = true;
+      // 模块切换     
+      this.modle = data.type
     },
-    
     /**
      * 发送邮箱验证码
      */
-    sendMail() {
-      /* 发送邮箱验证码 */
-      sendMail(this.formRegister.email).then(res => {
-        console.log(res)
-        if(res.data.err == 0)
-        this.$message({
-          showClose: true,
-          message: "邮件已发送，请注意接收哦！",
-          type: 'success',
-          offset:'80'
-        });
-      }).catch((err) => {
-        console.log(err)
-      })
-    },
-
-    /**
-     * 点击注册按钮事件
-     * */
-    register() {
-      if (this.formRegister.username.length <= 0) {
-        this.$message({
-          showClose: true,
-          type: 'error',
-          message: "用户名不能为空",
-          offset:'80'
-        });
-      } else if(this.formRegister.password.length <= 0) {
-        this.$message({
-          showClose: true,
-          type: 'error',
-          message: "密码不能为空",
-          offset:'80'
-        });
-      } else {
-        registe(this.formRegister).then(res => {
-          if(res.data.err == 0){
-            this.$message({
-              showClose: true,
-              message: res.data.msg,
-              type: 'success',
-              offset:'80'
-            });
-          }else{
-            this.$message({
-              showClose: true,
-              type: 'error',
-              message: res.data.msg,
-              offset:'80'
-            });
-          }
-        }).catch((err) => {
-          console.log(err)
-        })
-      }
-    },
-
-    /**
-     * 点击登录按钮
-     * */
-    userLogin() {
-      if (this.formLogin.user.length <= 0) {
-          this.$message({
-            showClose: true,
-            type: 'error',
-            message: "用户名不能为空",
-            offset:'80'
+    sendMail(formName) {
+      this.$refs[formName].validateField("email", err => {
+        if (!err) {
+          // 邮箱验证通过 发送邮箱验证码
+          sendMail(this.formLogin.email).then(res => {
+            if(res.data.err == 0){
+              this.$message({
+                message: "邮件已发送，请注意接收哦！",
+                type: 'success',
+                offset:'80'
+              });
+            }else {
+              this.$message({
+                message: res.data.msg,
+                type: 'error',
+                offset:'80'
+              });
+            }
+          }).catch((err) => {
+            console.log(err)
           });
-      } else if(this.formLogin.password.length <= 0) {
-          this.$message({
-            showClose: true,
-            type: 'error',
-            message: "密码不能为空",
-            offset:'80'
-          });
-      } else {
-        userLogin(this.formLogin.user,this.formLogin.password).then(res => {
-          let data = res.data.data;
-          if (res.data.err == 0) {
-            localStorage.setItem("username", data.token);
-            this.$message({
-              showClose: true,
-              message: res.data.msg,
-              type: 'success',
-              offset:'80'
-            });
-            this.formLogin.password = '';
-            this.$emit('logined',true);
-            this.$router.back();
-            location.reload();
-            // this.$router.replace('/home')
+        } else {
+          return false;
+        }
+      });
+    },
+    /**
+     * 点击提交按钮
+     * */
+    submitClick(formName) {
+      // 提交验证
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if(this.modle === "login"){
+            // 登录模块
+            userLogin(this.formLogin.username,this.formLogin.password).then(res => {
+              let data = res.data.data;
+              if (res.data.err == 0) {
+                localStorage.setItem("username", data.token); // token存储到本地
+                this.$message({
+                  message: res.data.msg,
+                  type: 'success',
+                  offset:'80'
+                });
+                this.formLogin.password = '';
+                this.$emit('logined',true);
+                location.reload();
+              }else {
+                this.$message({
+                  type: 'error',
+                  message: res.data.msg,
+                  offset:'80'
+                });
+              }
+            }).catch((err) => {
+              console.log(err)
+            })
           }else {
-            this.$message({
-              showClose: true,
-              type: 'error',
-              message: res.data.msg,
-              offset:'80'
-            });
+            // 注册模块
+            registe(this.formLogin).then(res => {
+              if(res.data.err == 0){
+                this.$message({
+                  showClose: true,
+                  message: res.data.msg,
+                  type: 'success',
+                  offset:'80'
+                });
+              }else{
+                this.$message({
+                  showClose: true,
+                  type: 'error',
+                  message: res.data.msg,
+                  offset:'80'
+                });
+              }
+            }).catch((err) => {
+              console.log(err)
+            })
           }
-        }).catch((err) => {
-          console.log(err)
-        })
-      }
+        } else {
+          return false;
+        }
+      });
     },
   }
-
 }
 </script>
 
-<style>
+<style scoped>
   .lor {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
+    background-color: #344a5f;
   }
-  .login-box {
-    margin-top: 2rem;
-    position: absolute;
-    top: 50%;
-    width: 30rem;
-    padding: 40px;
-    transform: translate(0, -50%);
-    background: rgba(0,0,0,.5);
+  .login_box{
+    margin: auto;
+    padding-top: 10rem;
+    padding-bottom: 1rem;
+    width: 25rem;
     box-sizing: border-box;
-    box-shadow: 0 15px 25px rgba(0,0,0,.6);
     border-radius: 10px;
   }
-  @media screen and (max-width:800px) {
-    .login-box {
-      width:70%;
-    }
-  }
-  @media screen and (max-width:480px) {
-    .login-box {
+  @media screen and (max-width:600px) {
+    .login_box {
       width:90%;
     }
   }
-  .login-box h2 {
-    margin: 0 0 30px;
-    color: #fff;
+  .menu-tab{
     text-align: center;
   }
-
-  .login-box .user-box {
-    position: relative;
-  }
-
-  .login-box .user-box input {
-    width: 100%;
-    padding: 10px 0;
-    font-size: 16px;
-    color: #fff;
-    margin-bottom: 20px;
-    border: none;
-    border-bottom: 1px solid #fff;
-    outline: none;
-    background: transparent;
-  }
-  .login-box .user-box label {
-    position: absolute;
-    top:0;
-    left: 0;
-    padding: 10px 0;
-    font-size: 16px;
-    color: #fff;
-    pointer-events: none;
-    transition: .5s;
-  }
-
-  .login-box .user-box input:focus ~ label,
-  .login-box .user-box input:valid ~ label {
-    top: -20px;
-    left: 0;
-    color: #03e9f4;
-    font-size: 12px;
-  }
-
-  .login-box form a {
-    position: relative;
+  .menu-tab li{
     display: inline-block;
-    padding: 8px 15px;
-    text-align: center;
-    color: #03e9f4;
-    font-size: 12px;
-    text-decoration: none;
-    text-transform: uppercase;
-    overflow: hidden;
-    transition: .5s;
-    margin-top: 20px;
+    width: 88px;
+    line-height: 36px;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 2px;
     cursor: pointer;
   }
-  .send_email {
-    display: flex;
-    justify-content: center;
-  }
-  .send_email a {
-    /* margin-top: 0px !important; */
-    margin-bottom: 10px;
-  }
-  .btn-box {
-    display: flex;
-    justify-content: space-between;
+  .current {
+    background-color: rgba(0,0,0,.2);
   }
 
-  .login-box a:hover {
-    background: #03e9f4;
+  .demo-ruleForm {
+    margin-top: 1.5rem;
+  }
+  .demo-ruleForm .el-form-item {
+    margin-bottom: 13px;
+  }
+  .el-form-item label{
     color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 5px #03e9f4,
-                0 0 25px #03e9f4,
-                0 0 50px #03e9f4,
-                0 0 100px #03e9f4;
   }
-
-  .login-box a span {
-    position: absolute;
+  .code-btn{
+    text-align: center;
+    width: 100%;
+  }
+  .submit {
     display: block;
-  }
-
-  .login-box a span:nth-child(1) {
-    top: 0;
-    left: -100%;
+    margin-top: 1rem;
     width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #03e9f4);
-    animation: btn-anim1 1s linear infinite;
   }
-
-  @keyframes btn-anim1 {
-    0% {
-      left: -100%;
-    }
-    50%,100% {
-      left: 100%;
-    }
-  }
-
-  .login-box a span:nth-child(2) {
-    top: -100%;
-    right: 0;
-    width: 2px;
-    height: 100%;
-    background: linear-gradient(180deg, transparent, #03e9f4);
-    animation: btn-anim2 1s linear infinite;
-    animation-delay: .25s
-  }
-
-  @keyframes btn-anim2 {
-    0% {
-      top: -100%;
-    }
-    50%,100% {
-      top: 100%;
-    }
-  }
-
-  .login-box a span:nth-child(3) {
-    bottom: 0;
-    right: -100%;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(270deg, transparent, #03e9f4);
-    animation: btn-anim3 1s linear infinite;
-    animation-delay: .5s
-  }
-
-  @keyframes btn-anim3 {
-    0% {
-      right: -100%;
-    }
-    50%,100% {
-      right: 100%;
-    }
-  }
-
-  .login-box a span:nth-child(4) {
-    bottom: -100%;
-    left: 0;
-    width: 2px;
-    height: 100%;
-    background: linear-gradient(360deg, transparent, #03e9f4);
-    animation: btn-anim4 1s linear infinite;
-    animation-delay: .75s
-  }
-
-  @keyframes btn-anim4 {
-    0% {
-      bottom: -100%;
-    }
-    50%,100% {
-      bottom: 100%;
-    }
-  }
-
 </style>

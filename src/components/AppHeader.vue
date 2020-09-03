@@ -32,8 +32,8 @@ export default {
     width: 100%;
     height: 4rem;
 
-    background: #fff;
-     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    background: #344a5f;
+     box-shadow: 0 12px 12px 0 rgba(0, 0, 0, 0.2);
 
     position: fixed;
     /* justify-content: center; */

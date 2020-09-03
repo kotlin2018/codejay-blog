@@ -1,6 +1,7 @@
 <template>
   <div class="detail">
     <el-page-header @back="goBack" content></el-page-header>
+    <!-- 文章 -->
     <div class="detail_header">
       <p class="art_title">{{articleDetail.article_title}}</p>
       <ul class="art_about">
@@ -31,21 +32,39 @@
     <div class="markdown-body">
       <div class="article_message hljs renderNav" v-html="articleDetail.article_content"></div>
     </div>
+
+    <!-- 分享 -->
+    <div class="detail_share">
+      <span style="{color:#9944ff;}">分享文章:</span>
+      <el-tooltip 
+        v-for="(item,index) in shareIcon" 
+        effect="dark" 
+        :content="item.content" 
+        :placement="item.direction">
+        <i @click="ArticleShare(index)" :class="item.icon"></i>
+      </el-tooltip>
+      <QrcodeVue v-show="qrcode" class="erweima" :value="detailURL"/>
+    </div>
+
+    <!-- 留言与回复 -->
     <replay-or-publish :articleId="id" @data="getMessageCount($event)"/>
   </div>
 </template>
 
 <script>
-import ReplayOrPublish from "../../components/common/replayOrpublish/ReplayOrPublish";
-import { getArticleDetail, getMessageAndReply } from '../../network/getContent';
-import hljs from "highlight.js";
+import ReplayOrPublish from "components/common/replayOrpublish/ReplayOrPublish";
+import { getArticleDetail, getMessageAndReply } from 'network/getContent';
+import uploadImage from 'network/uploadImage';
+import QrcodeVue from "qrcode.vue";
 import marked from "marked";
+import hljs from "highlight.js";
 import "highlight.js/styles/monokai-sublime.css";
 
 export default {
   name: "Detail",
   components: {
     ReplayOrPublish,
+    QrcodeVue
   },
   data() {
     return {
@@ -53,8 +72,35 @@ export default {
       author:'codejay',
       articleDetail: {},
       imgurl:'../../assets/img/hose.png',
-      messageCount:0
+      messageCount:0,
+      share_img:'',
+      share_brief: '',
+      share_title:'',
+      qrcode: false,
+      shareIcon: [
+        {
+          content: "分享到微博",
+          icon: "iconfont icon-weibo",
+          direction: "top"
+        },
+        {
+          content: "分享到微信",
+          icon: "iconfont icon-gongzhonghao",
+          direction: "top"
+        },
+        { content: "分享到QQ", icon: "iconfont icon-qq", direction: "top" },
+        {
+          content: "分享到QQ空间",
+          icon: "iconfont icon-qzone",
+          direction: "top"
+        }
+      ],
     };
+  },
+  computed: {
+    detailURL() {
+      return window.location.href;
+    },
   },
   methods: {
     goBack() {
@@ -62,11 +108,32 @@ export default {
     },
     getMessageCount(data) {
       this.messageCount = data;
-    }
+    },
+    ArticleShare(i) {
+      let link;
+      switch (i) {
+        case 0: // 微博
+          link = `http://service.weibo.com/share/share.php?url=${location.href}&title=${this.share_title}&pics=${this.share_img}&appkey='2706825840'`;
+          window.location.href = link;
+          break;
+        case 1: // 微信
+          this.qrcode = !this.qrcode;
+          break;
+        case 2: // qq
+          link = `http://connect.qq.com/widget/shareqq/index.html?url=${location.href}&sharesource=qzone&title=${this.share_title}&pics=${this.share_img}&summary=${this.share_brief}&desc=${this.share_brief}`;
+          window.location.href = link;
+          break;
+        case 3: // qq空间
+          link = `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${location.href}&sharesource=qzone&title=${this.share_title}&pics=${this.share_img}&summary=${this.share_brief}`;
+          window.location.href = link;
+          break;
+      }
+    },
   },
   mounted(){
+    var rendererMD = new marked.Renderer();
     marked.setOptions({
-      renderer: new marked.Renderer(),
+      renderer: rendererMD,
       highlight: function(code) {
         return hljs.highlightAuto(code).value;
       },
@@ -78,7 +145,8 @@ export default {
       smartLists: true,
       smartypants: false,
       xhtml: false
-    })
+    });
+    
   },
   created() {
     this.id = this.$route.params.id
@@ -86,8 +154,19 @@ export default {
       if(res.data.err == 0){
         let data = res.data.data[0];
         data.article_content = marked(data.article_content);
+        this.share_img = uploadImage.UPLOADIMG.BASEURL + data.article_image;
+        this.share_title = data.article_title;
+        this.share_brief = data.article_synopsis;
         this.articleDetail = data;
+      }else {
+        this.$message({
+          type:'success',
+          offset:'80',
+          message:res.data.msg
+        })
       }
+    }).catch(err => {
+      console.log(err);
     })
   },
 };
@@ -148,12 +227,76 @@ export default {
   background: #fff;
   line-height: 1.7rem;
   padding: 1rem;
-  margin: 3rem auto;
+  margin: 3rem auto 0 auto;
   border-radius: 5px;
 }
 @media screen and (max-width: 610px) {
   .article_message {
-    width: 100%;
+    width: 98%;
+  }
+  .detail_share span {
+    display: none;
   }
 }
+
+.detail_share {
+    position: relative;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    }
+    .erweima {
+      position: absolute;
+      top: -130px;
+      background: #fff;
+      padding: 0.4rem 0.4rem 0 0.4rem;
+      border-radius: 0.1rem;
+      border: 1px solid #ccc;
+    }
+  .detail_share span {
+      color: #333;
+      margin-right: 1rem;
+    }
+    .detail_share i {
+      padding: 0.6rem 0.63rem;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      margin: 0 1rem;
+      cursor: pointer;
+      transition: all 0.6s;
+    }
+    i.icon-weibo {
+      border: 1px solid rgb(255, 153, 0);
+      color: rgb(255, 153, 0);
+    }
+    i.icon-weibo:hover {
+      background: rgb(255, 153, 0);
+      color: white;
+    }
+    i.icon-gongzhonghao {
+      border: 1px solid lightgreen;
+      color: lightgreen;
+    }
+    i.icon-gongzhonghao:hover {
+      background: lightgreen;
+      color: white;
+    }
+    i.icon-qq {
+      border: 1px solid skyblue;
+      color: skyblue;
+    }
+    i.icon-qq:hover {
+      background: skyblue;
+      color: white;
+    }
+    i.icon-qzone {
+      border: 1px solid yellow;
+      color: yellow;
+    }
+    i.icon-qzone:hover {
+      background: yellow;
+      color: white;
+    }
 </style>

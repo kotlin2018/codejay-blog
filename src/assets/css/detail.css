@@ -98,7 +98,7 @@ iframe{
     color: rgb(241, 194, 106);
 }
 .markdown-body h3 {
-    color: #000 !important;
+    color: #67C23A !important;
     margin-top: 0.6rem;
 }
 .markdown-body h5 {
@@ -110,8 +110,20 @@ iframe{
     position: relative;
     margin: 1rem 0!important;
     padding: 0 0.3rem;
-    color: #000;
+    color: #909399;
+    font-size: .9rem;
 }
+
+.markdown-body a {
+    color: #409EFF;
+}
+
+.markdown-body blockquote>p{
+    font-size: 1rem;
+    /* margin-left: -1rem; */
+    color: #67C23A;
+}
+
 .markdown-body p>code,
 .markdown-body li>code {
     color:red;
@@ -119,6 +131,28 @@ iframe{
 }
 
 .markdown-body li {
+    color: #6e6e6e;
     margin-top: 1rem;
+    margin-left: 1.3em;
     height: 3rem;
+}
+
+
+.hljs-ln-numbers {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    text-align: center;
+    color: #ccc;
+    vertical-align: top;
+    padding-right: 5px;
+
+}
+
+.hljs-ln-code {
+    padding-left: 1em;
 }

@@ -5,6 +5,7 @@
       placeholder="请输入内容"
       v-model="keyWord"
       clearable
+      size="small"
       >
       <el-button slot="append" icon="el-icon-search" class="search-btn" @click="searchKeyWord"></el-button>
     </el-input>
@@ -41,6 +42,7 @@ export default {
       },
       searchKeyWord() {
         this.$store.state.keyWord = this.keyWord;
+        this.$router.replace("article");
         this.keyWord = '';
         this.drawer = false;
       }
@@ -68,6 +70,7 @@ export default {
     }
     .serch-none-btn {
       display: block;
+      color: #fff;
     }
   }
 
@@ -77,7 +80,7 @@ export default {
     }
     .nav-none-btn {
       display: block;
-
+      color:#fff;
     }
   }
   .search-btn:hover {

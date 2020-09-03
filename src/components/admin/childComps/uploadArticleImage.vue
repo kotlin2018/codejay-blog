@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import { cancelUpload } from "../../../network/adminOperation";
-import uploadImage from "../../../network/uploadImage";
+import { cancelUpload } from "network/adminOperation";
+import uploadImage from "network/uploadImage";
 
 export default {
   name:"uploadArticleImage",
@@ -89,11 +89,10 @@ export default {
       });
     },
   }
-
 }
 </script>
 
-<style>
+<style scoped>
   .upload_article_image {
     
     right: 1.5rem;

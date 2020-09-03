@@ -1,0 +1,122 @@
+
+  /*满天星*/
+
+.profile .wall{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.profile #background{
+    background: url("../../../assets/img/preview.jpg")no-repeat;
+    opacity: .4;
+    background-size: 100vw 100vh; 
+}
+
+.profile #midground{
+    background: url("../../../assets/img/midground.png");
+    z-index: 1;
+    -webkit-animation: cc 100s linear infinite;
+    -moz-animation: cc 100s linear infinite;
+    -o-animation: cc 100s linear infinite;
+    animation: cc 100s linear infinite;
+}
+.profile #foreground{
+    background: url("../../../assets/img/foreground.png");
+    z-index: 2;
+    -webkit-animation: cc 153s linear infinite;
+    -o-animation: cc 153s linear infinite;
+    -moz-animation: cc 153s linear infinite;
+    animation: cc 153s linear infinite;
+}
+.profile #top{
+    background: url("../../../assets/img/midground.png");
+    -webkit-animation: dd 100s linear infinite;
+    -o-animation: dd 100s linear infinite;
+    animation: da 100s linear infinite;
+}
+@-webkit-keyframes cc {
+    from{
+        background-position: 0 0;
+        transform: translateY(10px);
+    }
+    to{
+        background-position: 600% 0;
+    }
+}
+@-o-keyframes cc {
+    from{
+        background-position: 0 0;
+        transform: translateY(10px);
+    }
+    to{
+        background-position: 600% 0;
+    }
+}
+@-moz-keyframes cc {
+    from{
+        background-position: 0 0;
+        transform: translateY(10px);
+    }
+    to{
+        background-position: 600% 0;
+    }
+}
+@keyframes cc {
+    0%{
+        background-position: 0 0;
+    }
+    100%{
+        background-position: 600% 0;
+    }
+}
+
+@keyframes da {
+    0%{
+        background-position: 0 0;
+    }
+    100%{
+        background-position: 0 600%;
+    }
+}
+@-webkit-keyframes da {
+    0%{
+        background-position: 0 0;
+    }
+    100%{
+        background-position: 0 600%;
+    }
+}
+@-moz-keyframes da {
+    0%{
+        background-position: 0 0;
+    }
+    100%{
+        background-position: 0 600%;
+    }
+}
+@-ms-keyframes da {
+    0%{
+        background-position: 0 0;
+    }
+    100%{
+        background-position: 0 600%;
+    }
+}
+
+@media screen and (max-width: 600px) {
+  .profile #background{
+    background: url("../../../assets/img/preview2.jpg")no-repeat;
+    background-size: 100vw 100vh;
+  }
+  .profile #midground{
+      display: none;
+  }
+  .profile #foreground{
+    display: none;
+}
+.profile #top{
+    display: none;
+}
+}

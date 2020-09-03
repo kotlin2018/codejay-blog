@@ -2,7 +2,7 @@
   <div :class="{show:$store.state.tabcontroleIsShow}" class="MeunTab">
     <div class="tab_back" @click="tabBack"><i class="iconfont el-icon-d-arrow-left"></i></div>
     <div class="profile">
-      <img width="100" height="100" src="../assets/img/admintx.jpg" alt />
+      <img width="100" height="100" src="../assets/img/avatar.jpg" alt />
       <div class="profile">CodeJay</div>
     </div>
     <ul class="dis_nav_list" style="padding-left:1.5rem;">
@@ -13,21 +13,23 @@
         <i class="iconfont icon-gongzhonghao">:wj167758</i>
       </li>
       <li>
-        <i @click="$router.push('/home')" class="iconfont icon-shouye1">首页</i>
+        <i @click="$router.replace('/home')" class="iconfont icon-shouye1">首页</i>
       </li>
       <li>
-        <i @click="$router.push('/article')" class="iconfont icon-xiezi">文章列表</i>
+        <i @click="$router.replace('/article')" class="iconfont icon-xiezi">文章列表</i>
       </li>
       <li>
-        <i @click="$router.push('/demo')" class="iconfont icon-anli">Demo</i>
+        <i @click="$router.replace('/demo')" class="iconfont icon-anli">实战案例</i>
       </li>
       <li>
-        <i @click="$router.push('/about')" class="iconfont icon-wode">关于博主</i>
+        <i @click="$router.replace('/about')" class="iconfont icon-wode">关于博主</i>
       </li>
       <li>
-        <i @click="$router.push('/tool')" class="iconfont icon-gongju">软件&工具</i>
+        <i @click="$router.replace('/tool')" class="iconfont icon-gongju">素材&工具</i>
       </li>
-
+      <li>
+        <i @click="Gogithub" class="iconfont icon-github">GitHub</i>
+      </li>
       <li>
         <i @click="skip" class="iconfont icon-geren2">登陆 / 注册</i>
       </li>
@@ -47,14 +49,10 @@ export default {
       this.$store.state.tabcontroleIsShow = !this.$store.state.tabcontroleIsShow;
     },
     skip() {
-      if (localStorage.getItem("username")) {
-        this.$router.push("/logined");
-        return;
-      }
-      this.$router.push("/login");
+      this.$router.replace("/login");
     },
     Gogithub() {
-      location.href = "https://github.com/Acmenlei";
+      location.href = "https://github.com/Jay-wj";
     }
   }
 };
@@ -96,8 +94,6 @@ export default {
   font-size: 1rem;
   font-style: normal;
   margin-left: 1rem;
-  /* color: rgba(255, 255, 255, .8); */
-  /* color: #e5ff00; */
   color: #fff;
 }
 
@@ -106,16 +102,6 @@ export default {
     display: none;
   }
 }
-/* @media screen and (max-width: 930px) { */
-  /* .dis_nav_list > li i {
-    font-size: 1rem;
-    font-style: normal;
-    margin-left: 1rem;
-  } */
-  /* .MeunTab {
-    display: block;
-  } */
-/* } */
 .dis_nav_list > li i:hover {
   cursor: pointer;
   color: #9466ff;

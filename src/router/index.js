@@ -1,60 +1,55 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import {adminIsLogined} from '../network/adminOperation'
+import {adminIsLogined} from 'network/adminOperation'
 
-import {
-  getToken
-} from '../utils/getToken'
-
-const Home = () => import('../views/home/Home');
-const Article = () => import('../views/article/Article');
-const Demo = () => import('../views/demo/Demo');
-const Tool = () => import('../views/tool/Tool');
-const About = () => import('../views/about/About');
-const Login = () => import('../views/login/Login');
-const Essay = () => import('../views/essay/Essay');
-const Detail = () => import('../views/detail/Detail');
 // // 插件安装
 Vue.use(VueRouter);
 
-
-const routes = [{
+const routes = [
+  {
     path: '',
     redirect: '/home'
   },
   {
     path: '/home',
-    component: Home
+    name: 'Home',
+    component: () => import('../views/home/Home.vue')
   },
   {
-    // path: '/category/:name',
     path: '/article',
-    component: Article
+    name: 'Article',
+    component: () => import('../views/article/Article.vue')
   },
   {
     path: '/demo',
-    component: Demo
+    name: 'Demo',
+    component: () => import('../views/demo/Demo.vue')
   },
   {
     path: '/tool',
-    component: Tool
+    name: 'Tool',
+    component: () => import('../views/tool/Tool.vue')
   },
   {
     path: '/about',
-    component: About
+    name: 'About',
+    component: () => import('../views/about/About.vue')
   },
   {
     path: '/login',
-    component: Login
-  },
-  {
-    path: '/essay',
-    component: Essay
+    name: 'Login',
+    component: () => import('../views/login/Login.vue')
   },
   {
     path: '/detail/:id',
-    component: Detail
+    name: 'Detail',
+    component: () => import('../views/detail/Detail.vue')
   },
+  {
+    path: '/admin/login',
+    name: 'adminLogin',
+    component: () => import('../components/admin/childComps/adminLogin.vue')
+  }, 
   {
     path: '/admin',
     name: 'admin',
@@ -85,6 +80,26 @@ const routes = [{
         name: 'articleMessage',
         component: () => import('../components/admin/childComps/articleMessage.vue')
       },
+      {
+        path: '/admin/user/management',
+        name: 'userManagement',
+        component: () => import('../components/admin/childComps/userManagement.vue')
+      },
+      {
+        path: '/admin/notice/publish',
+        name: 'notice',
+        component: () => import('../components/admin/childComps/notice.vue')
+      },
+      {
+        path: '/admin/tool/publish',
+        name: 'toolPublish',
+        component: () => import('../components/admin/childComps/toolPublish.vue')
+      },
+      {
+        path: '/admin/demo/publish',
+        name: 'demoPublish',
+        component: () => import('../components/admin/childComps/demoPublish.vue')
+      },
     ]
   },
 ]
@@ -95,62 +110,28 @@ const router = new VueRouter({
 })
 
 
+/* 重定向不报错 */
+const originalPush = VueRouter.prototype.replace
+VueRouter.prototype.replace = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
-// const whiteRouter = ['/login'];  // indexOf 方法
-
-// // 路由守卫
-// router.beforeEach((to, from, next) => {
-//   if (getToken()) {
-//     console.log('存在')
-//   }else {
-//     console.log('不存在')
-//     if(whiteRouter.indexOf(to.path) !== -1) {
-//       next()
-//     }else {
-//       next('/login')
-//     }
-//   }
-// })
-
-/* 全局导航守卫 */
-// router.beforeEach((to,from,next) => {
-//   if(to.path=="/login") {
-//       if(localStorage.getItem('username')) {
-//         router.replace({name:'logined'})
-//       }
-//   }
-//   next()
-// })
 /* 管理系统守卫 */
 router.beforeEach((to,from,next) => {
   if(to.path.includes("/admin")) {
     adminIsLogined().then(res => {
+      console.log(res.data.data)
       if(res.data.err === 0) {
         next()
       } else {
-        // alert(res.data.message);
-        next('/login')
+        next('/admin/login')
       }
+    }).catch(err => {
+      
     })
   }
   next()
 })
-
-
-
-// 以登陆状态
-// router.beforeEach((to, from, next) => {
-//   if(to.path.includes("/login")) {
-//     adminIsLogined().then(res => {
-//       if(res.data.err != 0) {
-//         router.push({ name:'admin/article'})
-//       } else {
-//         router.push({ name: 'login'})
-//       }
-//     })
-//   }
-//   next()
-// })
 
 // 导出
 export default router;

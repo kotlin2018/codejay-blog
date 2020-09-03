@@ -26,7 +26,7 @@
       </el-table-column>
     </el-table>
     <h3>添加标签</h3>
-    <el-select v-model="label.categoryId" placeholder="请选择分类">
+    <el-select class="add_label_box" v-model="label.categoryId" placeholder="请选择分类">
       <el-option
         v-for="item in categroies"
         :key="item.article_category_id"
@@ -35,18 +35,18 @@
       </el-option>
     </el-select>
     <el-input
-      class="add_category_box"
+      class="add_label_box"
       placeholder="请输入标签名"
       v-model="label.labelName"
       clearable>
     </el-input>
-    <el-button type="primary" :plain="true" @click="addLabel">确认添加</el-button>
+    <el-button type="primary" @click="addLabel">确认添加</el-button>
   </div>
 </template>
 
 <script>
-import { addLabel, updateLabel, deleteLabel, getArticle } from '../../../network/adminOperation';
-import { getCategory, getLabel } from '../../../network/getContent'
+import { addLabel, updateLabel, deleteLabel, getArticle } from 'network/adminOperation';
+import { getCategory, getLabel } from 'network/getContent'
 export default {
   name: "articleLabel",
   data() {
@@ -68,23 +68,34 @@ export default {
   methods: {
     /* 添加标签 */
     addLabel() {
-      addLabel(this.label).then(res => {
-        if(res.data.err == 0) {
-          this.$message({
+      if(this.label.categoryId && this.label.labelName){
+        addLabel(this.label).then(res => {
+          if(res.data.err == 0) {
+            this.$message({
+              showClose: true,
+              message: res.data.msg,
+              type: 'success',
+              offset:'80'
+            });
+            this.label.labelName = '';
+            this.label.categoryId = '';
+            location.reload();
+          }else {
+            this.$message({
             showClose: true,
             message: res.data.msg,
-            type: 'success'
+            type: 'error',
+            offset:'80'
           });
-          this.label.labelName = '';
-          this.label.categoryId = ''
-        }else {
-          this.$message({
-          showClose: true,
-          message: res.data.msg,
-          type: 'error'
-        });
-        }
-      })
+          }
+        })
+      }else {
+        this.$message({
+          type:'warning',
+          message:'内容不完整！',
+          offset:'80'
+        })
+      }
     },
     /* 修改标签 */
     handleEdit(index, row) {
@@ -94,23 +105,35 @@ export default {
         }).then(({ value }) => {
           this.updateLabelName.oldLabelName = row.article_label_name;
           this.updateLabelName.newLabelName = value;
-          return updateLabel(this.updateLabelName)
+          if(this.updateLabelName.newLabelName) {
+            return updateLabel(this.updateLabelName)
+          }else {
+            return this.$message({
+              type:'warning',
+              message:'内容不能够为空',
+              offset:'80'  
+            })
+          }
         }).then(res => {
           if(res.data.err == 0){
             this.$message({
               type: 'success',
-              message: '修改成功'
+              message: '修改成功',
+              offset:'80'
             });
+            location.reload();
           }else {
             this.$message({
             type: 'error',
-            message: res.data.msg
+            message: res.data.msg,
+            offset:'80'
             })
           }
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '取消输入'
+            message: '取消输入',
+            offset:'80'
           });       
         });
     },
@@ -118,21 +141,31 @@ export default {
       if(row.article.length > 0){
         this.$message({
           type: 'error',
-          message: '该标签涉及到文章，不可删除'
+          message: '该标签涉及到文章，不可删除！',
+          offset:'80'
         })
       }else{
-        deleteLabel(row.article_label_id).then(res => {
-          if(res.data.err == 0){
-            this.$message({
-              type: 'success',
-              message: res.data.msg
-            });
-          }else {
-            this.$message({
-              type: 'error',
-              message: res.data.msg
-            })
-          }
+        this.$confirm('此操作将永久删除该标签, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteLabel(row.article_label_id).then(res => {
+            if(res.data.err == 0){
+              this.$message({
+                type: 'success',
+                message: res.data.msg,
+                offset:'80'
+              });
+              location.reload();
+            }else {
+              this.$message({
+                type: 'error',
+                message: res.data.msg,
+                offset:'80'
+              })
+            }
+          })
         })
       }
     }
@@ -147,7 +180,8 @@ export default {
       }else{
         this.$message({
           type: 'error',
-          message: res.data.msg
+          message: res.data.msg,
+          offset:'80'
         })
       }
     }).then(res => {
@@ -165,7 +199,8 @@ export default {
       }else {
         this.$message({
           type: 'error',
-          message: res.data.msg
+          message: res.data.msg,
+          offset:'80'
         })
       }
     }).then(res => {
@@ -183,15 +218,18 @@ export default {
       }else {
         this.$message({
           type: 'error',
-          message: res.data.msg
+          message: res.data.msg,
+          offset:'80'
         })
       }
+    }).catch(err => {
+      console.log(err);
     })
   }
 };
 </script>
 
-<style>
+<style scoped>
 .article_category {
   padding: 1rem 1.5rem 1.5rem 1rem;
 }
@@ -201,12 +239,9 @@ export default {
 .el-table {
   border-radius: 10px;
 }
-.add_category_box{
+.add_label_box{
   width: 35%;
   display: block;
   margin-bottom: 1rem;
-}
-.el-select {
-  margin: 1rem 0;
 }
 </style>

@@ -16,9 +16,6 @@ export default {
       }
     };
   },
-  computed:{
-
-  },
   methods: {
     pageChange() {
       console.log(this.page.pageNo)

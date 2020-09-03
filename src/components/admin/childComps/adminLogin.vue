@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import {adminLogin} from '../../../network/adminOperation';
+import {adminLogin} from 'network/adminOperation';
 export default {
   name:'adminLogin',
   data() {
@@ -44,14 +44,13 @@ export default {
         adminLogin(this.formLogin.user,password).then(res => {
           console.log(res)
           if (res.data.err === 0) {
-            this.$router.replace('/admin')
+            this.$router.replace('/admin/article/management');
             this.$message({
               showClose: true,
               message: res.data.msg,
               type: 'success',
               offset:'80'
             });
-            // location.reload();
           }else {
             this.$message({
               showClose: true,
@@ -60,9 +59,7 @@ export default {
               offset:'80'
             });
           }
-        }).catch((err) => {
-          console.log(err)
-        })
+        }).catch((err) => {})
       }
     }
   }
@@ -70,6 +67,9 @@ export default {
 </script>
 
 <style>
+.admin_login{
+  height: 100vh;
+}
 .admin_login_box {
 	width:40%;
 	padding:40px;

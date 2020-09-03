@@ -1,9 +1,9 @@
 <template>
   <div class="article">
-    <div class="article_box">
-    <article-list class="article_list"/>
-    <side class="side-comp"/>
-    </div>
+      <div class="article_box">
+        <article-list class="article_list"/>
+        <side class="side-comp"/>
+      </div>
   </div>
 </template>
 

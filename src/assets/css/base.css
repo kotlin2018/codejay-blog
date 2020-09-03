@@ -65,12 +65,12 @@ h1 {
 .home,.article,.demo,.about,.login,.tool,.essay,.detail { 
   min-height: calc(100vh);
 }
-.article,.demo,.about,.login,.tool,.essay,.detail {
+.article,.demo,.about,.tool,.essay,.detail {
   max-width: 1200px;
   margin: 0 auto;
 }
 @media screen and (max-width:1200px) {
-  .article,.demo,.about,.login,.tool,.essay,.detail {
+  .article,.demo,.about,.tool,.essay,.detail {
     padding: 0 1rem;
   }
 }

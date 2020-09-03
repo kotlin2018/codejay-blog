@@ -1,5 +1,4 @@
 import {instance} from './request';
-import qs from 'qs';
 
 // 获取分类
 export function getCategory(){
@@ -54,4 +53,19 @@ export function getNewMessage() {
 // 获取站点统计信息
 export function getSiteStatistics() {
   return instance.get("/article/getSiteStatistics")
+}
+
+// 获取最新公告
+export function getNotice() {
+  return instance.get("/notice/getNotice")
+}
+
+// 获取素材&工具
+export function getTool() {
+  return instance.get("/tool/getTool")
+}
+
+// 获取Demo
+export function getDemo() {
+  return instance.get("/demo/getDemo")
 }

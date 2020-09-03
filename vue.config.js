@@ -1,25 +1,23 @@
 const webpack = require('webpack')
-let  isDev = process.env.NODE_ENV;  //当前的环境
+const path = require("path")
 module.exports = {
-
   configureWebpack: {
     resolve: {
       alias: {
         '@': 'src',
-        'assets': 'src/assets',
-        'common': 'src/common',
-        'components': 'src/components',
-        'network': 'src/network',
-        'views': 'src/views',
+        'assets': path.resolve(__dirname,'src/assets'),
+        'components': path.resolve(__dirname,'src/components'),
+        'network': path.resolve(__dirname,'src/network'),
+        'utils': path.resolve(__dirname,'src/utils'),
+        'views': path.resolve(__dirname,'src/views'),
       }
     },
     devServer: {
       disableHostCheck: true,
       proxy: {
         '/api': {
-          target: 'http://XXX.XXX.X.XXX:XXX', //设置你调用的接口域名和端口号 别忘了加http
-          // changeOrigin: true, //这里设置是否跨域
-          changeOrigin:isDev==='development'?true:false,
+          target: 'http://xxx.xxxxx.xx', //设置你调用的接口域名和端口号 别忘了加http
+          changeOrigin: true, //这里设置是否跨域
           pathRewrite: {
             '^/api': ''
           }
@@ -35,5 +33,5 @@ module.exports = {
         "windows.jQuery": "jquery"
       })
     ],
-  },
+  }
 }

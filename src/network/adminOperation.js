@@ -74,6 +74,19 @@ export function deleteArticle(articleId,imgsrc) {
   return instance.post('/article/deleteArticle',data)
 }
 
+// 获取用户
+export function getAllUserInfo(){
+  return instance.get("/user/getAllUserInfo")
+}
+
+// 删除用户
+export function deleteUser(username) {
+  let data = qs.stringify({
+    username:username
+  })
+  return instance.post('/user/deleteUser',data)
+}
+
 // 添加分类
 export function addCategory(category) {
   let data = qs.stringify({
@@ -132,6 +145,36 @@ export function deleteMessage(messageId,articleId) {
     articleId:articleId
   })
   return instance.post('/article/deleteMessage',data)
+}
+
+// 发布公告
+export function publishNotice(notice) {
+  let data = qs.stringify({
+    notice:notice
+  })
+  return instance.post('/notice/publish',data)
+}
+
+// 发布素材&工具
+export function publishTool(tool) {
+  let data = qs.stringify({
+    toolName:tool.toolName,
+    toolPath:tool.toolPath,
+    toolImage:tool.toolImage,
+    toolBrief:tool.toolBrief
+  })
+  return instance.post('/tool/publish',data)
+}
+
+// 发布Demo
+export function publishDemo(demo) {
+  let data = qs.stringify({
+    demoName:demo.demoName,
+    demoPath:demo.demoPath,
+    demoVideo:demo.demoVideo,
+    demoBrief:demo.demoBrief
+  })
+  return instance.post('/demo/publish',data)
 }
 
 // 退出后台

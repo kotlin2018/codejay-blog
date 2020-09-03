@@ -43,11 +43,6 @@ export default {
 </script>
 
 <style>
-  .theme {
-    /* width: 100%;
-    height: 100%; */
-    /* overflow:hidden; */
-  }
   #Tz_perspective{
     perspective:2000px;
   }
@@ -74,15 +69,4 @@ export default {
     -moz-border-radius:5px; 
     border-radius:5px;
   }
-  /* #Tz_wrap p{ 
-    width:1200px; 
-    background:-webkit-radial-gradient(center center,600px 600px,rgba(122,122,124,0.2),rgba(0,0,0,0));
-    border-radius:100%; 
-    position:absolute; 
-    left:50%; 
-    top:102%; 
-    margin-left:-600px; 
-    margin-top:-600px; 
-    transform:rotateX(90deg); 
-  } */
 </style>

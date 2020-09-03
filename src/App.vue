@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <el-backtop   :visibility-height="300"><i class="iconfont icon-icon-test"></i></el-backtop>
+    <el-backtop   :visibility-height="300"><i class="iconfont icon-huojian"></i></el-backtop>
     <app-header :style="{display:showNav}" ref="appHeader"></app-header>
       <keep-alive exclude="Detail,admin">
         <router-view @click="tabIsShow"></router-view>
@@ -39,9 +39,8 @@ export default {
       return;
     }
   },
-  
-  
   watch: {
+    /* 根据路由是否显示导航栏 */
     $route(to, from) {
       if (
         to.path != "/" &&
@@ -51,8 +50,6 @@ export default {
       ) {
         this.showNav = "block";
         this.$store.state.tabcontroleIsShow = false;
-        this.$forceUpdate();
-        
       } else {
         this.showNav = "none";
         this.$store.state.tabcontroleIsShow = false;
@@ -68,7 +65,6 @@ export default {
 #app {
   height: 100%;
   width: 100%;
-  /* overflow-y: scroll; */
   background: url(assets/img/blogbg.png);
   -webkit-overflow-scrolling: touch;
 }
@@ -77,6 +73,7 @@ export default {
   display: -webkit-flex;
   display: flex;
   font-size: 26px;
-  color: #6644ff;
+  color: #9944ff;
 }
+
 </style>

@@ -1,9 +1,7 @@
 <template>
 <div class="login">
   <div class="login_box" v-show="!isLogined">
-    <admin-login v-show="isShow"/>
-    <lor v-show="!isShow" @logined="logined()"/>
-      <el-button class="login_switch" @click="loginSwitch" type="info" icon="el-icon-s-custom" circle></el-button>
+    <lor @logined="logined()"/>
   </div>
   <div class="profile_box" v-show="isLogined">
     <profile @exitLogined="exitLogined()"/>
@@ -12,31 +10,25 @@
 </template>
 
 <script>
-import adminLogin from '../../components/admin/childComps/adminLogin'
 import Lor from './childComps/Lor'
 import Profile from './childComps/Profile'
-import { getCategory } from '../../network/getContent'
+import { getCategory } from 'network/getContent'
 export default {
   name: 'Login',
   data() {
     return {
       isLogined:false,
-      isShow:false,
     }
   },
   components: {
-    adminLogin,
     Lor,
     Profile
   },
   methods: {
-    loginSwitch() {
-      this.isShow = !this.isShow;
-    },
-    logined(param) {
+    logined() {
       this.isLogined = !this.isLogined;
     },
-    exitLogined(param) {
+    exitLogined() {
       this.isLogined = !this.isLogined;
     }
   },
@@ -44,31 +36,15 @@ export default {
     if(typeof(localStorage.username) != "undefined"){
       this.isLogined = true;
     }
-
-    
   }
 }
 </script>
 
 <style>
-  .login {
-    max-width: 1200px;
-    padding-top: 80px;
-    padding-bottom: 20px;
-  }
+  @import url('./childComps/profile.css');
+  
   .login_box {
-    width: 100%;
-    height:calc(100vh - 80px);
+    min-height: 100vh;
   }
 
-  .login_switch {
-    position: absolute;
-    right: 0;
-    top: 50%;
-  }
-  @media screen and (max-width: 1200px) {
-  .login_switch {
-    display: none;
-  }
-}
 </style>

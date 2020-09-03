@@ -70,15 +70,15 @@
     <div id="editor">
       <mavon-editor style="height: 100%"  v-model="articleDate.content" ref="md"></mavon-editor>
     </div>
-    <el-button v-show="!edit" type="primary" plain @click="PublishButton">文章发布</el-button>
-    <el-button v-show="edit" type="primary" plain @click="editButton">确认修改</el-button>
+    <el-button v-show="!edit" type="primary" @click="PublishButton">文章发布</el-button>
+    <el-button v-show="edit" type="primary" @click="editButton">确认修改</el-button>
   </div>
 </template>
 
 <script>
-import { articlePublish, cancelUpload, updateArticle } from "../../../network/adminOperation";
-import uploadImage from "../../../network/uploadImage";
-import { getCategory, getLabel } from '../../../network/getContent';
+import { articlePublish, cancelUpload, updateArticle } from "network/adminOperation";
+import uploadImage from "network/uploadImage";
+import { getCategory, getLabel } from 'network/getContent';
 import uploadArticleImage from './uploadArticleImage';
 
 export default {
@@ -113,54 +113,53 @@ export default {
   methods: {
     // 发布文章
     PublishButton() {
-      articlePublish(this.articleDate).then((res) => {
-        if (res.data.err == 0) {
-          // 成功
-          this.$message({
-            showClose: true,
-            message: res.data.msg,
-            type: 'success',
-            offset:'80'
-          });
-          // 清空所有输入框内数据
-          Object.keys(this.articleDate).forEach(
-            (key) => (this.articleDate[key] = "")
-          );
-          this.$refs.upload.clearFiles();
-        } else {
-          this.$message({
-            showClose: true,
-            message: res.data.msg,
-            type: 'error',
-            offset:'80'
-          });
-        }
-      });
+      if(this.articleDate.imgsrc&&this.articleDate.title&&this.articleDate.brief&&this.articleDate.content&&this.articleDate.label&&this.articleDate.categroy){
+        articlePublish(this.articleDate).then((res) => {
+          if (res.data.err == 0) {
+            // 成功
+            this.$message({
+              message: res.data.msg,
+              type: 'success',
+              offset:'80'
+            });
+            // 清空所有输入框内数据
+            Object.keys(this.articleDate).forEach(
+              (key) => (this.articleDate[key] = "")
+            );
+            this.$refs.upload.clearFiles();
+          } else {
+            this.$message({
+              message: res.data.msg,
+              type: 'error',
+              offset:'80'
+            });
+          }
+        }).catch(err => {})
+      }else {
+        this.$message({
+          type:'warning',
+          message:'太马虎了！内容不完整哦！',
+          offset:'80'
+        })
+      }
     },
     editButton() {
       updateArticle(this.articleDate,this.editArticleId).then((res) => {
         if (res.data.err == 0) {
           // 成功
           this.$message({
-            showClose: true,
             message: res.data.msg,
             type: 'success',
             offset:'80'
           });
-          // 清空所有输入框内数据
-          // Object.keys(this.articleDate).forEach(
-          //   (key) => (this.articleDate[key] = "")
-          // );
-          // this.$refs.upload.clearFiles();
         } else {
           this.$message({
-            showClose: true,
             message: res.data.msg,
             type: 'error',
             offset:'80'
           });
         }
-      });
+      }).catch(err => {})
     },
     // 上传图片
     handleSuccess(res) {
@@ -238,8 +237,14 @@ export default {
     getCategory().then((res) => {
       if (res.data.err == 0) {
         this.categroies = res.data.data;
+      }else{
+        this.$message({
+          message: res.data.msg,
+          type: 'error',
+          offset:'80'
+        });
       }
-    });
+    }).catch(err => {})
 
     // 获取标签
     getLabel().then((res) => {
@@ -257,13 +262,19 @@ export default {
             this.obj[categoryName].push(item);
           }
         });
+      }else{
+        this.$message({
+          message: res.data.msg,
+          type: 'error',
+          offset:'80'
+        });
       }
-    });
+    }).catch(err => {})
   },
 };
 </script>
 
-<style>
+<style scoped>
 .article_publish {
   padding: 1rem 1.5rem 1.5rem 1rem;
 }

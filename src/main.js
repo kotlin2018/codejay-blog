@@ -10,7 +10,6 @@ import router from './router';
 import store from './store';
 import './utils/clicklove/clicklove';
 import './assets/iconfont/iconfont.css';
-import "./assets/css/blog.css";
 // fade/zoom 等
 import 'element-ui/lib/theme-chalk/base.css';
 // collapse 展开折叠

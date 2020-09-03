@@ -1,4 +1,4 @@
-# codejay_blog
+# coderjay_blog
 
 ## Project setup
 ```

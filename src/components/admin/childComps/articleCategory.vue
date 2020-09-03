@@ -3,7 +3,6 @@
     <h1>文章分类</h1>
     <h3>分类表</h3>
     <el-table :data="tableData" v-loading="loading" style="width: 80%; ">
-      <!-- <el-table-column type="selection" width="55"></el-table-column> -->
       <el-table-column label="分类名" width="180">
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.category }}</span>
@@ -33,13 +32,13 @@
       v-model="categoryName"
       clearable>
     </el-input>
-    <el-button type="primary" :plain="true" @click="addCategory">确认添加</el-button>
+    <el-button type="primary" @click="addCategory">确认添加</el-button>
   </div>
 </template>
 
 <script>
-import { addCategory, updateCategory, deleteCategory, getArticle } from '../../../network/adminOperation';
-import { getCategory, getLabel } from '../../../network/getContent'
+import { addCategory, updateCategory, deleteCategory, getArticle } from 'network/adminOperation';
+import { getCategory, getLabel } from 'network/getContent'
 export default {
   name: "articleCategory",
   data() {
@@ -56,26 +55,36 @@ export default {
     };
   },
   methods: {
+    // 添加分类
     addCategory() {
-      console.log(this.$refs.cate)
-      if(this.categoryName != ''){
+      if(this.categoryName){
         addCategory(this.categoryName).then(res => {
           console.log(res)
           if(res.data.err == 0){
             this.categoryName = ''
             this.$message({
-              showClose: true,
+              offset:'80',
               message: res.data.msg,
               type: 'success'
             });
+            location.reload();
           }else {
-            this.$message.warning(res.data.msg);
+            this.$message({
+              offset:'80',
+              message: res.data.msg,
+              type: 'error'
+            });
           }
-        })
+        }).catch(err => {})
       }else{
-        this.$message.warning('内容不能为空哦！');
+        this.$message({
+          offset:'80',
+          message: '分类名不能为空',
+          type:'warning'
+        });
       }
     },
+    // 修改分类
     handleEdit(index, row) {
       this.$prompt('请输入新的分类名', `当前分类名：${row.category}`, {
           confirmButtonText: '确定',
@@ -83,50 +92,70 @@ export default {
         }).then(({ value }) => {
           this.updateCategoryName.oldCategoryName = row.category;
           this.updateCategoryName.newCategoryName = value;
-          return updateCategory(this.updateCategoryName)
+          if(this.updateCategoryName.newCategoryName){
+            return updateCategory(this.updateCategoryName)
+          }else{
+            return this.$message({
+              type:'warning',
+              message:'内容不可为空',
+              offset:'80'
+            });
+          }
         }).then(res => {
           if(res.data.err == 0){
             this.$message({
               type: 'success',
-              message: '修改成功'
+              message: '修改成功',
+              offset:'80'
             });
+            location.reload();
           }else {
             this.$message({
             type: 'error',
-            message: res.data.msg
+            message: res.data.msg,
+            offset:'80'
             })
           }
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '取消输入'
+            message: '取消输入',
+            offset:'80'
           });       
         });
     },
     handleDelete(index, row) {
       if(row.label.length > 0){
-        // alert('有相关标签或文章，不可删除')
         this.$message({
           type: 'error',
-          message: '该分类与其他元素有关联，不可删除'
+          message: '该分类与其他元素有关联，不可删除!',
+          offset:'80'
         })
       }else{
-        deleteCategory(row.category).then(res => {
-          if(res.data.err == 0){
-            this.$message({
-              type: 'success',
-              message: res.data.msg
-            });
-          }else {
-            this.$message({
-              type: 'error',
-              message: res.data.msg
-            })
-          }
+        this.$confirm('此操作将永久删除该分类, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteCategory(row.category).then(res => {
+            if(res.data.err == 0){
+              this.$message({
+                type: 'success',
+                message: res.data.msg,
+                offset:'80'
+              });
+              location.reload();
+            }else {
+              this.$message({
+                type: 'error',
+                message: res.data.msg,
+                offset:'80'
+              })
+            }
+          }).catch(err => {})
         })
-      }
-      console.log(index, row);
-    },
+      } 
+    },  
     getData() {
       getCategory().then(res => {
         if (res.data.err == 0) {
@@ -136,14 +165,14 @@ export default {
             newobj.category = item.article_category_name;
             newobj.categoryid = item.article_category_id;
             this.tableData.push(newobj)
-            // this.$set(this.tableData,index,newobj)
           })
           // promise 返回获取标签函数
           return getLabel();
         }else {
           this.$message({
             type: 'error',
-            message: '网络异常，请稍后重试！'
+            message: '网络异常，请稍后重试！',
+            offset:'80'
           })
         }
       }).then(res => {
@@ -172,7 +201,8 @@ export default {
         }else {
           this.$message({
             type: 'error',
-            message: '网络异常，请稍后重试！'
+            message: '网络异常，请稍后重试！',
+            offset:'80'
           })
         }
       }).then(res => {
@@ -186,6 +216,8 @@ export default {
             }
           })
         })
+      }).catch(err => {
+        console.log(err)
       })
     }
   },
@@ -197,7 +229,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .article_category {
   padding: 1rem 1.5rem 1.5rem 1rem;
 }
@@ -211,5 +243,8 @@ export default {
   width: 35%;
   display: block;
   margin-bottom: 1rem;
+}
+.add_category_box .el-input{
+  width: 100%;
 }
 </style>

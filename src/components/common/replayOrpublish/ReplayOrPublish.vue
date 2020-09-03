@@ -4,19 +4,15 @@
       <textarea class="txtarea" maxlength="200" cols="100%" rows="5" v-model="messageContent" placeholder="你想说些什么呢..."></textarea>
       <el-button plain class="leave_btn" @click="leaveMessages">提交评论</el-button>
     </div>
-    <!-- <div class="reply">
-      <div><el-input placeholder="请输入回复内容" v-model="replyContent" clearable></el-input></div>
-      <div><el-button type="primary">确认</el-button><el-button type="danger">取消</el-button></div>
-    </div> -->
     <div class="leavemessage">
       <div class="leaveitem" v-for="item in message">
         <div class="header">
           <div>
-            <span><el-avatar shape="square" :size="35" fit="cover" :src="baseUrl+'/'+item.head_image"></el-avatar></span>
-            <span>&nbsp;{{item.username}}</span>
+            <span><el-avatar shape="square" :size="35" fit="cover" :src="baseUrl+item.head_image"></el-avatar></span>
+            <span class="name">&nbsp;{{item.username}}</span>
           </div>
           <div class="date_right">
-            <span>{{item.messageFloor}}楼&nbsp;</span>
+            <span>{{item.messageFloor}}楼&nbsp;&nbsp;&nbsp;</span>
             <span>{{item.message_time}}</span>
           </div>
         </div>
@@ -33,8 +29,8 @@
         <div class="reply_item" v-for="key in item.reply">
           <div class="header">
             <div>
-              <span><el-avatar shape="square" :size="35" fit="cover" :src="baseUrl+'/'+key.head_image"></el-avatar></span>
-              <span>&nbsp;{{key.username}}</span>
+              <span><el-avatar shape="square" :size="35" fit="cover" :src="baseUrl+key.head_image"></el-avatar></span>
+              <span class="name">&nbsp;{{key.username}}</span>
             </div>
             <div class="date_right">
               <span>{{key.replyFloor}}楼&nbsp;</span>
@@ -42,9 +38,7 @@
             </div>
           </div>
           <div class="content">
-            <!-- <span>回复{{item.username}}</span> -->
-            <span>回复{{item.username}}: {{key.reply_content}}</span>
-            <!-- <span ><el-button class="replybtn" type="text" >回复</el-button></span> -->
+            <span><span class="name">@ {{item.username}}</span>: {{key.reply_content}}</span>
           </div>
         </div>
         <el-divider></el-divider>
@@ -55,41 +49,16 @@
 </template>
 
 <script>
-import { leaveMessages, leaveReply } from '../../../network/userOperation';
-import { getMessageAndReply, hasMessage } from '../../../network/getContent';
-import uploadImage from "../../../network/uploadImage";
+import { leaveMessages, leaveReply } from 'network/userOperation';
+import { getMessageAndReply, hasMessage } from 'network/getContent';
+import uploadImage from "network/uploadImage";
 
 export default {
   name: "ReplayOrPublish",
   props: ['articleId'],
   data() {
     return {
-      message:[
-        // {
-        //   leaveAvaterUrl:"http://192.168.1.106:3000/public/avatar/defalut.jpg",
-        //                   http://192.168.1.106:3000/public/avator/default.jpg
-        //   leaveUsername: "zhangsan",
-        //   leaveFloor: 1,
-        //   leaveDate: "2020-07-04 20:38",
-        //   leaveContent:'抓住2021的尾巴',
-        //   reply: [
-        //     {
-        //       replyAvaterUrl:"https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-        //       replyUsername: "lisi",
-        //       replyFloor: 1,
-        //       replyDate: "2020-07-05 08:32",
-        //       replyContent:'加油',
-        //     },
-        //     {
-        //       replyAvaterUrl:"https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-        //       replyUsername: "wangwu",
-        //       replyFloor: 2,
-        //       replyDate: "2020-07-05 09:37",
-        //       replyContent:'努力',
-        //     },
-        //   ],
-        // },
-      ],
+      message:[], // 已留言内容
       baseUrl:uploadImage.UPLOADIMG.BASEURL,
       messageContent:'', // 文章留言内容
       replyContent:'', // 留言回复内容
@@ -111,7 +80,6 @@ export default {
           leaveMessages(message).then(res => {
             if(res.data.err == 0){
               this.$message({
-                showClose: true,
                 message: res.data.msg,
                 type: 'success',
                 offset:'80'
@@ -120,14 +88,13 @@ export default {
               location.reload();
             }else {
               this.$message({
-                showClose: true,
                 type: 'error',
                 message: res.data.msg,
                 offset:'80'
               });
               this.$router.replace('/login')
             }
-          })
+          }).catch(err => {})
         }
         /* 如果为空我们就不发起请求 给用户提示不能为空 */
         else {
@@ -162,25 +129,22 @@ export default {
           leaveReply(reply).then(res => {
             if(res.data.err == 0){
               this.$message({
-                showClose: true,
                 message: res.data.msg,
                 type: 'success',
                 offset:'80'
               });
-              getMessageAndReply(this.articleId);
               this.replyContent = '';
               this.currentMessageId = null;
               location.reload();
             }else {
               this.$message({
-                showClose: true,
                 type: 'error',
                 message: res.data.msg,
                 offset:'80'
               });
               this.$router.replace('/login')
             }
-          })
+          }).catch(err => {})
         }
         /* 如果为空我们就不发起请求 给用户提示不能为空 */
         else {
@@ -216,14 +180,13 @@ export default {
             })
           });
           this.message = data;
-          // console.log(this.message)
         }else {
           this.$message({
-            type: 'info',
+            type: 'error',
             message: res.data.msg
           });   
         }
-      })
+      }).catch(err => {})
     },
   },
   mounted() {
@@ -234,11 +197,13 @@ export default {
         if(res.data.data > 0){
           this.getMessageAndReply(this.articleId);
         }
+      }else{
+        this.$message({
+          type: 'error',
+          message: res.data.msg
+        }); 
       }
-    })
-  },
-  created() {
-    
+    }).catch(err => {})
   },
 }
 
@@ -289,6 +254,13 @@ export default {
 .header .date_right {
   padding-top: 1.5rem;
 }
+
+ @media screen and (max-width: 600px) {
+  .leavemessage {
+    font-size: .9rem;
+  }
+}
+
 .leavemessage .content {
   /* padding-bottom: .5rem; */
   display: flex;
@@ -299,10 +271,11 @@ export default {
 }
 .reply_item {
   margin-left: 2.5rem;
-  margin-right: -.5rem;
   background: rgba(0, 0, 0, 0.05);
   padding: .5rem;
 }
-
+.name {
+  color: #9466ff;
+}
 
 </style>

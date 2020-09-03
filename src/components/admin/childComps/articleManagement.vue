@@ -1,12 +1,10 @@
 <template>
   <div class="article_management">
     <h1>文章管理</h1>
-    <h3>文章表</h3>
     <el-table :data="tableData" v-loading="loading" style="width: 100%; ">
-      <!-- <el-table-column type="selection" width="55"></el-table-column> -->
       <el-table-column label="文章标题" width="230">
         <template slot-scope="scope">
-          <span style="-webkit-line-clamp: 2;display: -webkit-box;word-break: break-all;-webkit-box-orient: vertical;line-height: 1.8;">{{ scope.row.article_title }}</span>
+          <span style="-webkit-line-clamp: 1;display: -webkit-box;word-break: break-all;-webkit-box-orient: vertical;line-height: 1.8;">{{ scope.row.article_title }}</span>
         </template>
       </el-table-column>
       <el-table-column label="文章配图" width="100" >
@@ -18,15 +16,21 @@
       </el-table-column>
       <el-table-column label="文章简介">
         <template slot-scope="scope">
-          <span style="-webkit-line-clamp: 2;display: -webkit-box;word-break: break-all;-webkit-box-orient: vertical;line-height: 1.8;">{{ scope.row.article_synopsis }}</span>
+          <span style="-webkit-line-clamp: 1;display: -webkit-box;word-break: break-all;-webkit-box-orient: vertical;line-height: 1.8;">{{ scope.row.article_synopsis }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="文章评论" width="100">
+      <el-table-column label="评论数" width="100">
         <template slot-scope="scope">
           <span style="margin-left: 0px">评论数：{{ scope.row.article_messagecount }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作"width="230">
+      <el-table-column label="发布日期" width="120">
+        <template slot-scope="scope">
+          <i class="el-icon-time"></i>
+          <span style="margin-left: 0px"> {{ scope.row.article_time }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作"width="200">
         <template slot-scope="scope">
           <el-popover
             placement="right"
@@ -47,8 +51,8 @@
 </template>
 
 <script>
-import { getArticle, deleteArticle } from '../../../network/adminOperation';
-import uploadImage from "../../../network/uploadImage";
+import { getArticle, deleteArticle } from 'network/adminOperation';
+import uploadImage from "network/uploadImage";
 import articlePublish from './articlePublish';
 
 export default {
@@ -60,8 +64,7 @@ export default {
     return {
       tableData:[],
       list:{},
-      loading: true,
-      
+      loading: true
     }
   },
   methods: {
@@ -88,7 +91,7 @@ export default {
               message: res.data.msg
             })
           }
-        })
+        }).catch(err => {})
       })
     },
     
@@ -101,7 +104,6 @@ export default {
         data.forEach((item,index) => {
           item.article_image = uploadImage.UPLOADIMG.BASEURL + item.article_image;
           this.$set(this.tableData, index, item)
-          console.log(this.tableData)
         });
         this.loading = false;
       }else {
@@ -110,17 +112,17 @@ export default {
           message: res.data.msg
         })
       }
-    })
+    }).catch(err => {})
   }
 }
 </script>
 
-<style>
+<style scoped>
   .article_management {
     padding: 1rem 1.5rem 1.5rem 1rem;
   }
-  .article_management h3 {
-    margin: 1.5rem 0 0.5rem 0;
+  .article_management h1 {
+    margin-bottom: 1rem;
   }
   .el-table {
     border-radius: 10px;

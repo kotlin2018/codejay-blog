@@ -54,14 +54,19 @@ export default {
   methods: {
     test(){
       localStorage.clear();
-      this.$emit("exitLogined",false)
+      this.$emit("exitLogined",false);
+      this.$message({
+        type:'success',
+        offset:'80',
+        message:'不舍~ 期待您的下次登录哦！'
+      })
     },
     showOp(){
       this.showOperation = !this.showOperation;
     },
     handleAvatarSuccess(res) {
       if (res.err == 0) {
-        this.imageUrl = this.baseUrl +"/" + res.data.imgUrl;
+        this.imageUrl = this.baseUrl + res.data.imgUrl;
         console.log(res.data.imgUrl)
         let updateData = {};
         updateData.username = localStorage.getItem("username");
@@ -81,7 +86,6 @@ export default {
             location.reload();
           }
         })
-        // this.$message.warning(res.msg);
         this.$message({
           showClose: true,
           message: res.msg,
@@ -114,11 +118,17 @@ export default {
       getUserInfo(localStorage.getItem('username')).then(res => {
         if(res.data.err == 0) {
           this.username = res.data.data[0].username;
-          this.imgSrc = this.baseUrl + "/" + res.data.data[0].head_image;
-          this.avatarImage = "/"+res.data.data[0].head_image;
+          this.imgSrc = this.baseUrl + res.data.data[0].head_image;
+          this.avatarImage = res.data.data[0].head_image;
         }else {
-
+          this.$message({
+            type:'error',
+            offset:'80',
+            message:res.data.msg
+          })
         }
+      }).catch(err => {
+        console.log(err)
       })
     }
   }
@@ -126,144 +136,26 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .profile {
   display: flex;
   width: 100%;
   justify-content: center;
 }
-  
-  /*满天星*/
-
-.profile .wall{
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-}
-.profile #background{
-    background: url("../../../assets/img/preview.jpg")no-repeat;
-    opacity: .4;
-    /* background: rgba(0,0,0,.5); */
-    /* -webkit-animation: dd 100s linear infinite;
-    -moz-animation: dd 100s linear infinite;
-    -o-animation: dd 100s linear infinite;
-    animation: dd 100s linear infinite;*/
-    background-size: 100vw 100vh; 
-}
-
-.profile #midground{
-    background: url("../../../assets/img/midground.png");
-    z-index: 1;
-    -webkit-animation: cc 100s linear infinite;
-    -moz-animation: cc 100s linear infinite;
-    -o-animation: cc 100s linear infinite;
-    animation: cc 100s linear infinite;
-}
-.profile #foreground{
-    background: url("../../../assets/img/foreground.png");
-    z-index: 2;
-    -webkit-animation: cc 153s linear infinite;
-    -o-animation: cc 153s linear infinite;
-    -moz-animation: cc 153s linear infinite;
-    animation: cc 153s linear infinite;
-}
-.profile #top{
-    background: url("../../../assets/img/midground.png");
-    /* z-index: 4; */
-    -webkit-animation: dd 100s linear infinite;
-    -o-animation: dd 100s linear infinite;
-    animation: da 100s linear infinite;
-}
-@-webkit-keyframes cc {
-    from{
-        background-position: 0 0;
-        transform: translateY(10px);
-    }
-    to{
-        background-position: 600% 0;
-    }
-}
-@-o-keyframes cc {
-    from{
-        background-position: 0 0;
-        transform: translateY(10px);
-    }
-    to{
-        background-position: 600% 0;
-    }
-}
-@-moz-keyframes cc {
-    from{
-        background-position: 0 0;
-        transform: translateY(10px);
-    }
-    to{
-        background-position: 600% 0;
-    }
-}
-@keyframes cc {
-    0%{
-        background-position: 0 0;
-    }
-    100%{
-        background-position: 600% 0;
-    }
-}
-
-@keyframes da {
-    0%{
-        background-position: 0 0;
-    }
-    100%{
-        background-position: 0 600%;
-    }
-}
-@-webkit-keyframes da {
-    0%{
-        background-position: 0 0;
-    }
-    100%{
-        background-position: 0 600%;
-    }
-}
-@-moz-keyframes da {
-    0%{
-        background-position: 0 0;
-    }
-    100%{
-        background-position: 0 600%;
-    }
-}
-@-ms-keyframes da {
-    0%{
-        background-position: 0 0;
-    }
-    100%{
-        background-position: 0 600%;
-    }
-}
 
  .profile_content {
-   /* position: absolute; */
-   /* background-color: red; */
-   z-index: 9999;
    top:5rem;
+   z-index: 2;
    width: 100%;
-   /* overflow: hidden; */
-   /* border: 1px solid #fff; */
  }
 
  .profile_content .username {
    margin-left: 1.2rem;
    font-size: 2rem;
-   /* border: 1px solid #fff; */
    color: #fff;
  }
  .operation {
    width: 50%;
-   /* height: 10rem; */
    margin-left: 25%;
    margin-top: 1rem;
    padding: 1rem;
@@ -295,10 +187,6 @@ export default {
   }
 
  @media screen and (max-width: 600px) {
-  .profile #background{
-    background: url("../../../assets/img/preview2.jpg")no-repeat;
-    background-size: 100vw 100vh;
-  }
   .operation {
     width: 100%;
     margin-left: 0;
