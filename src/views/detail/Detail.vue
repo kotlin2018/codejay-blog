@@ -37,7 +37,8 @@
     <div class="detail_share">
       <span style="{color:#9944ff;}">分享文章:</span>
       <el-tooltip 
-        v-for="(item,index) in shareIcon" 
+        v-for="(item,index) in shareIcon"
+        :key="item.id" 
         effect="dark" 
         :content="item.content" 
         :placement="item.direction">
@@ -46,12 +47,16 @@
       <QrcodeVue v-show="qrcode" class="erweima" :value="detailURL"/>
     </div>
 
+    <!-- 打赏 -->
+    <Reward/>  
+
     <!-- 留言与回复 -->
     <replay-or-publish :articleId="id" @data="getMessageCount($event)"/>
   </div>
 </template>
 
 <script>
+import Reward from "components/common/Reward";
 import ReplayOrPublish from "components/common/replayOrpublish/ReplayOrPublish";
 import { getArticleDetail, getMessageAndReply } from 'network/getContent';
 import uploadImage from 'network/uploadImage';
@@ -63,6 +68,7 @@ import "highlight.js/styles/monokai-sublime.css";
 export default {
   name: "Detail",
   components: {
+    Reward,
     ReplayOrPublish,
     QrcodeVue
   },
@@ -299,4 +305,12 @@ export default {
       background: yellow;
       color: white;
     }
+    .reward{
+      text-align: center;
+      font-size: .9rem;
+      color: gold;
+      cursor: pointer;
+      margin-bottom: 2rem;
+    }
+    
 </style>

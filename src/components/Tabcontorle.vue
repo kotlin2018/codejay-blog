@@ -1,6 +1,6 @@
 <template>
   <div :class="{show:$store.state.tabcontroleIsShow}" class="MeunTab">
-    <div class="tab_back" @click="tabBack"><i class="iconfont el-icon-d-arrow-left"></i></div>
+    <div class="tab_back" @click="tabBack"><i class="iconfont icon-zuo"></i><i class="iconfont icon-zuo"></i></div>
     <div class="profile">
       <img width="100" height="100" src="../assets/img/avatar.jpg" alt />
       <div class="profile">CodeJay</div>
@@ -76,7 +76,7 @@ export default {
   position: absolute;
   top: 49%;
   right: .2rem;
-  color: #e5ff00;
+  color: #fff;
   opacity: 1;
   
 }

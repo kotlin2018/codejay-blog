@@ -16,13 +16,12 @@ module.exports = {
       disableHostCheck: true,
       proxy: {
         '/api': {
-          target: 'http://xxx.xxxxx.xx', //设置你调用的接口域名和端口号 别忘了加http
+          target: 'http://www.codejay.cn:3000', //设置你调用的接口域名和端口号 别忘了加http http://172.17.143.169:3000
           changeOrigin: true, //这里设置是否跨域
           pathRewrite: {
             '^/api': ''
           }
         }
-
       },
     },
     plugins: [

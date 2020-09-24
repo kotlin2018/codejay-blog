@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "405754",
+      "name": "zhifubao",
+      "font_class": "zhifubao",
+      "unicode": "e6b8",
+      "unicode_decimal": 59064
+    },
+    {
+      "icon_id": "4532571",
+      "name": "打赏",
+      "font_class": "dashang",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
       "icon_id": "880307",
       "name": "音乐",
       "font_class": "yinlemusic215",

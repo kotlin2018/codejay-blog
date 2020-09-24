@@ -43,6 +43,7 @@
 <script>
 import SideItem from './SideItem';
 import {tagCloud} from 'utils/tagcloud';
+// import Bus from 'utils/bus.js';
 import uploadImage from "network/uploadImage";
 import { getLabel, getCategory, getNewMessage, getSiteStatistics,getNotice } from 'network/getContent';
 export default {
@@ -68,10 +69,14 @@ export default {
   },
   methods: {
     labelClick(labelId) {
-      this.$store.state.labelId = labelId;
+      let date = Date.parse(new Date());
+      // Bus.$emit('labelId', labelId) ;
+      this.$store.state.labelId = labelId + date;
     },
     categoryClick(categoryId) {
-      this.$store.state.categoryId = categoryId;
+      let date = Date.parse(new Date());
+      this.$store.state.categoryId = categoryId + date;
+      // Bus.$emit('categoryId', categoryId);
     }
   },
   created() {

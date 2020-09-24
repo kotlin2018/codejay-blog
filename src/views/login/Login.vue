@@ -10,9 +10,10 @@
 </template>
 
 <script>
-import Lor from './childComps/Lor'
-import Profile from './childComps/Profile'
-import { getCategory } from 'network/getContent'
+import Lor from './childComps/Lor';
+import Profile from './childComps/Profile';
+import { getCategory } from 'network/getContent';
+import { userIsLogined } from 'network/userOperation';
 export default {
   name: 'Login',
   data() {
@@ -32,9 +33,25 @@ export default {
       this.isLogined = !this.isLogined;
     }
   },
-  mounted(){
+  created(){
     if(typeof(localStorage.username) != "undefined"){
-      this.isLogined = true;
+      userIsLogined(localStorage.username).then(res => {
+        if(res.data.err === 0){
+          this.isLogined = true;
+          this.$message({
+            type:'success',
+            message:res.data.msg,
+            offset:'80'
+          })
+        }else{
+          localStorage.removeItem("username");
+          this.$message({
+            type:'error',
+            message:res.data.msg,
+            offset:'80'
+          })
+        }
+      }).catch(err => {})
     }
   }
 }

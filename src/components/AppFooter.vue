@@ -3,7 +3,7 @@
   <div class="footer">
     <section>
       {{friendShipLinks}}<br/><br/>
-      &copy; Codejay Blog All Rights Reserved 2020-2021 豫ICP备<a href="http://beian.miit.gov.cn/">2020025683</a>号
+      &copy; Codejay Blog All Rights Reserved 2020-2021 豫ICP备 <a href="http://beian.miit.gov.cn/">2020025683</a> 号
     </section>
   </div>
 </template>
@@ -13,7 +13,7 @@ export default {
   name: 'AppFooter',
   data() {
     return {
-      friendShipLinks:'友情链接: ',
+      friendShipLinks:'',
       // record:'Codejay Blog All Rights Reserved 2020-2021 豫ICP 备2020025683号'
     }
   }
@@ -41,7 +41,11 @@ export default {
     margin: auto;
     padding:15px 10px;
 
-    font-size: 14px;
+    font-size: 12.5px;
+    text-align: center;
   }
 
+  section a:hover{
+    color: #9966ff;
+  }
 </style>

@@ -117,7 +117,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
   .article_management {
     padding: 1rem 1.5rem 1.5rem 1rem;
   }

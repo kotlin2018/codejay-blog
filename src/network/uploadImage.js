@@ -1,6 +1,6 @@
 export default {
   UPLOADIMG: {
-    BASEURL: 'http://xxx.xxxxx.xx', // 后台地址
+    BASEURL: 'http://www.codejay.cn:3000', // 后台地址http://172.17.143.169:3000
     UPLOADURL: '/upload', // 文章封面图路径
     UPLOADIMAGEURL: '/articleImages', // 文章内容插图
     UPLOADAVATAR: '/userAvatar', // 用户头像

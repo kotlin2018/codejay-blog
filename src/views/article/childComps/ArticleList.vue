@@ -12,7 +12,7 @@
         <header>
           <span class="article_category">{{item.article_category_name}}</span>
           <span class="article_title">{{item.article_label_name}}</span>
-          <a href="#">{{item.article_title}}</a>
+          <span class="a" @click="toDetail(item.article_id)">{{item.article_title}}</span>
         </header>
         <section>
           <p class="summary" data-v-19a52a1e>{{item.article_synopsis}}</p>
@@ -38,8 +38,8 @@
 
 <script>
 import Page from "./Page";
-import { Message } from 'element-ui';
-import { articleLike } from 'network/userOperation';
+// import Bus from 'utils/bus.js';
+import { articleLike, userIsLogined } from 'network/userOperation';
 import uploadImage from "network/uploadImage";
 import { getArticlePage, getLabelPage, getCategoryPage, getKeyWordPage } from 'network/getContent';
 
@@ -52,35 +52,41 @@ export default {
     return {
       articleLists: [],
       articleCounts: 0,
+      // 文章页码与每页显示数量
       page: {
-        pageNo:1,
-        pageSize:5,
-      }
+        pageNo:1,  //页码
+        pageSize:5,  // 每页数量
+      },
+      categoryId:'',
+      labelId:'',
+      keyWord:''
     };
   },
   computed:{
     currentLabelId: {
       get (){
-        return this.$store.state.labelId;
-      },
-      set(value) {
-        this.$store.state.labelId = value;
+        let date = Date.parse(new Date());
+        // 获取事件总线labelId
+        // Bus.$on('labelId', labelId => { this.labelId = labelId + date });
+        this.labelId = this.$store.state.labelId;
+        return this.labelId;
       }
     },
     currentCategoryId: {
       get (){
-        return this.$store.state.categoryId;
-      },
-      set(value) {
-        this.$store.state.categoryId = value;
+        let date = Date.parse(new Date());
+        // 获取事件总线categoryId
+        // Bus.$on('categoryId', categoryId => { this.categoryId = categoryId + date });
+        this.categoryId = this.$store.state.categoryId;
+        return this.categoryId;
       }
     },
     currentKeyWord: {
       get (){
-        return this.$store.state.keyWord;
-      },
-      set(value) {
-        this.$store.state.keyWord = value;
+        // 获取事件总线keyWord
+        // Bus.$on('keyWord', keyWord => { this.keyWord = keyWord });
+        this.keyWord = this.$store.state.keyWord;
+        return this.keyWord;
       }
     },
     liked() {
@@ -111,33 +117,43 @@ export default {
       })
     },
     likeArticle(articleId) {
-        if(localStorage.getItem('username')) {
-          if(localStorage.getItem(`like${articleId}`)) {
-          Message({
-            showClose: true,
+      if(localStorage.getItem('username')) {
+        if(localStorage.getItem(`like${articleId}`)) {
+          this.$message({
             message: '你已经为这篇文章点过赞了噢~o(*￣▽￣*)o',
             type: 'warning',
             offset:'80'
           });
         } else {
-          /* 发送请求 */
-          articleLike(articleId).then(res => {
-            if(res.data.err == 0){
-              Message({
-                showClose: true,
-                message: res.data.msg,
-                type: 'success',
-                offset:'80'
-              });
-              localStorage.setItem(`like${articleId}`,articleId);
-              this.articleLists.forEach(item => {
-                if(item.article_id == articleId){
-                  item.num_likes += 1;
+          userIsLogined(localStorage.username).then(res => {
+            if(res.data.err === 0){
+              /* 发送请求 */
+              articleLike(articleId).then(res => {
+                if(res.data.err == 0){
+                  this.$message({
+                    showClose: true,
+                    message: res.data.msg,
+                    type: 'success',
+                    offset:'80'
+                  });
+                  localStorage.setItem(`like${articleId}`,articleId);
+                  this.articleLists.forEach(item => {
+                    if(item.article_id == articleId){
+                      item.num_likes += 1;
+                    }
+                  })
+                }else {
+                  this.$message({
+                    message: res.data.msg,
+                    type: 'error',
+                    offset:'80'
+                  });
                 }
               })
             }else {
-              Message({
-                showClose: true,
+              // token已过期
+              localStorage.removeItem("username");
+              this.$message({
                 message: res.data.msg,
                 type: 'error',
                 offset:'80'
@@ -145,18 +161,18 @@ export default {
             }
           })
         }
-        } else {
-           Message({
-                showClose: true,
-                message: "请先去登陆再来点赞噢小主！(ノへ￣、)",
-                type: 'error',
-                offset:'80'
-            });
-        }
-      },
+      } else {
+        this.$message({
+          message: "请先去登陆再来点赞噢小主！(ノへ￣、)",
+          type: 'error',
+          offset:'80'
+        });
+      }
+    },
   },
   watch: {
     currentLabelId(value) {
+      value = value.toString().substring(11,13);
       getLabelPage(this.page,value).then(res => {
         this.articleCounts = res.data.count;
         if(res.data.err == 0) {
@@ -171,6 +187,7 @@ export default {
       })
     },
     currentCategoryId(value) {
+      value = value.toString().substring(11,13);
       getCategoryPage(this.page,value).then(res => {
         this.articleCounts = res.data.count;
         if(res.data.err == 0) {
@@ -187,7 +204,7 @@ export default {
     currentKeyWord(value) {
       getKeyWordPage(this.page,value).then(res => {
         this.articleCounts = res.data.count;
-        if(res.data.err == 0) {
+        if(res.data.err === 0) {
           let data = res.data.data;
           data.forEach(item => {
             item.article_image = uploadImage.UPLOADIMG.BASEURL + item.article_image;
@@ -310,10 +327,14 @@ footer,
   position: absolute;
 }
 /*文章标题*/
-header a {
+header .a {
   margin-left: 20px;
   font-size: 17.5px;
   color: #2b2b2b;
+  cursor: pointer;
+}
+header .a:hover{
+  color: #9966ff;
 }
 /*文章内容*/
 .summary {

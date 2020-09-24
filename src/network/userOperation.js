@@ -10,8 +10,13 @@ export function userLogin(userName,userPassword) {
   return instance.post('/user/login',data)
 }
 
-// 获取用户信息
-
+// 用户验证token是否过期
+export function userIsLogined(token) {
+  let data = qs.stringify({
+    token: token
+  })
+  return instance.post('/user/userIsLogined',data)
+}
 
 // 邮箱
 export function sendMail(mail) {

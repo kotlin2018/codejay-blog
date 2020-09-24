@@ -8,26 +8,26 @@
     <!-- 表单 -->
     <el-form :model="formLogin" status-icon :rules="rules" ref="formLogin" class="demo-ruleForm" size="medium">
       <el-form-item prop="username">
-        <label>用户名</label>
-        <el-input type="text" v-model="formLogin.username" autocomplete="off"></el-input>
+        <label for="username">用户名</label>
+        <el-input id="username" type="text" v-model="formLogin.username" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <label>密码</label>
-        <el-input type="password" v-model="formLogin.password" autocomplete="off"></el-input>
+        <label for="password">密码</label>
+        <el-input id="password" type="password" v-model="formLogin.password" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item prop="passwords" v-if="modle==='register'">
-        <label>确认密码</label>
-        <el-input type="password" v-model="formLogin.passwords" autocomplete="off"></el-input>
+        <label for="passwords">确认密码</label>
+        <el-input id="passwords" type="password" v-model="formLogin.passwords" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item prop="email" v-if="modle==='register'">
-        <label>邮箱</label>
-        <el-input type="text" v-model="formLogin.email" autocomplete="off"></el-input>
+        <label for="email">邮箱</label>
+        <el-input id="email" type="text" v-model="formLogin.email" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item prop="code" v-if="modle==='register'">
-        <label>验证码</label>
+        <label for="code">验证码</label>
         <el-row :gutter="5">
-          <el-col :span="16"><el-input type="text" class="code-text" v-model="formLogin.code" autocomplete="off"></el-input></el-col>
-          <el-col :span="8"><el-button type="success" @click="sendMail('formLogin')" class="code-btn">获取验证码</el-button></el-col>
+          <el-col :span="16"><el-input id="code" type="text" class="code-text" v-model="formLogin.code" autocomplete="off"></el-input></el-col>
+          <el-col :span="8"><el-button type="success" @click="sendMail('formLogin')" :disabled="codeButton.codeButtonState" class="code-btn">{{codeButton.codeButtonTxt}}</el-button></el-col>
         </el-row>
       </el-form-item>
       <el-form-item>
@@ -98,6 +98,12 @@ export default {
       ],
       // 当前模块
       modle:'login',
+      // 验证码按钮
+      codeButton:{
+        codeButtonState:false,
+        codeButtonTxt:'获取验证码'
+      },
+      //提交数据
       formLogin:{ 
         username:"",
         password:"",
@@ -147,29 +153,52 @@ export default {
       this.modle = data.type
     },
     /**
+     * 验证码倒计时
+     */
+    countDown(number){
+      let time = number;
+      let timer = setInterval(() => {
+        time--;
+        if(time === 0){
+          clearInterval(timer);
+          this.codeButton.codeButtonState = false;
+          this.codeButton.codeButtonTxt = '再次发送';
+        }else{
+          this.codeButton.codeButtonTxt = `倒计时${time}秒`;
+        }
+
+      },1000)
+    },
+    /**
      * 发送邮箱验证码
      */
     sendMail(formName) {
       this.$refs[formName].validateField("email", err => {
         if (!err) {
-          // 邮箱验证通过 发送邮箱验证码
-          sendMail(this.formLogin.email).then(res => {
-            if(res.data.err == 0){
-              this.$message({
-                message: "邮件已发送，请注意接收哦！",
-                type: 'success',
-                offset:'80'
-              });
-            }else {
-              this.$message({
-                message: res.data.msg,
-                type: 'error',
-                offset:'80'
-              });
-            }
-          }).catch((err) => {
-            console.log(err)
-          });
+          this.codeButton.codeButtonTxt = '发送中';
+          this.codeButton.codeButtonState = true;
+          // 延迟两秒发送请求
+          setTimeout(() => {
+            // 邮箱验证通过 发送邮箱验证码
+            sendMail(this.formLogin.email).then(res => {
+              if(res.data.err == 0){
+                this.countDown(60);
+                this.$message({
+                  message: "邮件已发送，请注意接收哦！",
+                  type: 'success',
+                  offset:'80'
+                });
+              }else {
+                this.$message({
+                  message: res.data.msg,
+                  type: 'error',
+                  offset:'80'
+                });
+              }
+            }).catch((err) => {
+              console.log(err)
+            });
+          },2000);
         } else {
           return false;
         }
@@ -211,14 +240,14 @@ export default {
             registe(this.formLogin).then(res => {
               if(res.data.err == 0){
                 this.$message({
-                  showClose: true,
                   message: res.data.msg,
                   type: 'success',
                   offset:'80'
                 });
+                // 注册成功回到登录窗口
+                this.modle = 'login';
               }else{
                 this.$message({
-                  showClose: true,
                   type: 'error',
                   message: res.data.msg,
                   offset:'80'

@@ -5,23 +5,11 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    token:'',
-    username:'',
+    tabcontroleIsShow:false,
     labelId:'',
     categoryId:'',
-    detailId:'',
-    keyWord:'',
-    currentMessageCount:0,
-    tabcontroleIsShow:false
-    },
-  mutations: {
-    SET_TOKEN(state,value) {
-      state.token = value
-    },
-    SET_USERNAME(state,value) {
-      state.username = value
-    }
-  }
+    keyWord:''
+  },
 })
 // 挂载到Vue实例上
 export default store;

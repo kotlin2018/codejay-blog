@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { leaveMessages, leaveReply } from 'network/userOperation';
+import { leaveMessages, leaveReply, userIsLogined } from 'network/userOperation';
 import { getMessageAndReply, hasMessage } from 'network/getContent';
 import uploadImage from "network/uploadImage";
 
@@ -69,42 +69,54 @@ export default {
     };
   },
   methods: {
+    /* 留言start */
     leaveMessages(){
       if(localStorage.getItem("username")){
-        /* 如果 留言不为空的话  */
-        if(this.messageContent){
-          let message = {};
-          message.username = localStorage.getItem("username");
-          message.messageContent = this.messageContent;
-          message.articleId =  this.articleId;
-          leaveMessages(message).then(res => {
-            if(res.data.err == 0){
-              this.$message({
-                message: res.data.msg,
-                type: 'success',
-                offset:'80'
-              });
-              this.messageContent = '';
-              location.reload();
-            }else {
-              this.$message({
-                type: 'error',
-                message: res.data.msg,
-                offset:'80'
-              });
-              this.$router.replace('/login')
+        userIsLogined(localStorage.username).then(res => {
+          if(res.data.err === 0){
+            /* 如果 留言不为空的话  */
+            if(this.messageContent){
+              let message = {};
+              message.username = localStorage.getItem("username");
+              message.messageContent = this.messageContent;
+              message.articleId =  this.articleId;
+              leaveMessages(message).then(res => {
+                if(res.data.err == 0){
+                  this.$message({
+                    message: res.data.msg,
+                    type: 'success',
+                    offset:'80'
+                  });
+                  this.messageContent = '';
+                  location.reload();
+                }else {
+                  this.$message({
+                    type: 'error',
+                    message: res.data.msg,
+                    offset:'80'
+                  });
+                  this.$router.replace('/login')
+                }
+              }).catch(err => {})
             }
-          }).catch(err => {})
-        }
-        /* 如果为空我们就不发起请求 给用户提示不能为空 */
-        else {
-          this.$message({
-            showClose: true,
-            message: "小主信息不能为空哦,(ノへ￣、)！",
-            type: 'warning',
-            offset:'80'
-          });
-        }
+            /* 如果为空我们就不发起请求 给用户提示不能为空 */
+            else {
+              this.$message({
+                message: "小主信息不能为空哦,(ノへ￣、)！",
+                type: 'warning',
+                offset:'80'
+              });
+            }
+          }else {
+            // token 过期
+            localStorage.removeItem("username");
+            this.$message({
+              type: 'error',
+              message: res.data.msg,
+              offset:'80'
+            });
+          }
+        }).catch(err => {})
       } else {
         this.$message({
           showClose: true,
@@ -114,57 +126,74 @@ export default {
         });
       }
     },
+    /* 留言end */
+
+    /* 有回复内容打开回复窗口 */
     openReplyBox(messageId){
       this.drawer = !this.drawer;
       this.currentMessageId = messageId;
     },
+
+    /* 回复start */
     leaveReply(){
       if(localStorage.getItem("username")){
-        /* 如果 留言不为空的话  */
-        if(this.replyContent){
-          let reply = {};
-          reply.username = localStorage.getItem("username");
-          reply.replyContent = this.replyContent;
-          reply.messageId =  this.currentMessageId;
-          leaveReply(reply).then(res => {
-            if(res.data.err == 0){
-              this.$message({
-                message: res.data.msg,
-                type: 'success',
-                offset:'80'
-              });
-              this.replyContent = '';
-              this.currentMessageId = null;
-              location.reload();
-            }else {
+        userIsLogined(localStorage.username).then(res => {
+          if(res.data.err === 0){
+            /* 如果 留言不为空的话  */
+            if(this.replyContent){
+              let reply = {};
+              reply.username = localStorage.getItem("username");
+              reply.replyContent = this.replyContent;
+              reply.messageId =  this.currentMessageId;
+              leaveReply(reply).then(res => {
+                if(res.data.err == 0){
+                  this.$message({
+                    message: res.data.msg,
+                    type: 'success',
+                    offset:'80'
+                  });
+                  this.replyContent = '';
+                  this.currentMessageId = null;
+                  location.reload();
+                }else {
+                  this.$message({
+                    type: 'error',
+                    message: res.data.msg,
+                    offset:'80'
+                  });
+                  this.$router.replace('/login')
+                }
+              }).catch(err => {})
+            }
+            /* 如果为空我们就不发起请求 给用户提示不能为空 */
+            else {
               this.$message({
                 type: 'error',
-                message: res.data.msg,
+                message: "小主信息不能为空哦,(ノへ￣、)！",
                 offset:'80'
               });
-              this.$router.replace('/login')
             }
-          }).catch(err => {})
-        }
-        /* 如果为空我们就不发起请求 给用户提示不能为空 */
-        else {
-          this.$message({
-            showClose: true,
-            type: 'error',
-            message: "小主信息不能为空哦,(ノへ￣、)！",
-            offset:'80'
-          });
-        }
+          }else {
+            // token 过期
+            localStorage.removeItem("username");
+            this.$message({
+              type: 'error',
+              message: res.data.msg,
+              offset:'80'
+            });
+          }
+        })
       } else {
         this.$message({
-          showClose: true,
           type: 'error',
           message: "请先去登陆再来回复哦,(ノへ￣、)！",
           offset:'80'
         });
       }
     },
-    // 获取留言与回复信息
+    /* 回复end */
+
+    /* 获取留言与回复信息 */
     getMessageAndReply(articleId) {
       getMessageAndReply(articleId).then(res => {
         if(res.data.err == 0){
@@ -190,6 +219,7 @@ export default {
     },
   },
   mounted() {
+    /* 判断该文章有无留言 */
     hasMessage(this.articleId).then(res => {
       if(res.data.err == 0) {
         this.messageCount = res.data.data
